@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import webcam.service.DeepSeekPraiseService;
 import webcam.service.FaceRecognitionService;
 import webcam.service.ImageStorageService;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,93 +27,116 @@ import java.util.UUID;
 @RequestMapping("/webcam")
 public class WebcamController {
 
-	private static final Logger logger = LoggerFactory.getLogger(WebcamController.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebcamController.class);
 
-	private final ImageStorageService imageStorageService;
-	private final FaceRecognitionService faceRecognitionService;
+    private final ImageStorageService imageStorageService;
+    private final FaceRecognitionService faceRecognitionService;
+    private final DeepSeekPraiseService deepSeekPraiseService;
 
-	/**
-	 * 构造函数，注入依赖的Service
-	 * 
-	 * @param imageStorageService    图像存储服务
-	 * @param faceRecognitionService 人脸识别服务
-	 */
-	@Autowired
-	public WebcamController(ImageStorageService imageStorageService,
-			FaceRecognitionService faceRecognitionService) {
-		this.imageStorageService = imageStorageService;
-		this.faceRecognitionService = faceRecognitionService;
-	}
+    /**
+     * 构造函数，注入依赖的Service
+     * 
+     * @param imageStorageService    图像存储服务
+     * @param faceRecognitionService 人脸识别服务
+     * @param deepSeekPraiseService  DeepSeek夸奖服务
+     */
+    @Autowired
+    public WebcamController(ImageStorageService imageStorageService,
+            FaceRecognitionService faceRecognitionService,
+            DeepSeekPraiseService deepSeekPraiseService) {
+        this.imageStorageService = imageStorageService;
+        this.faceRecognitionService = faceRecognitionService;
+        this.deepSeekPraiseService = deepSeekPraiseService;
+    }
 
-	/**
-	 * 处理图像上传和Face++ API调用
-	 *
-	 * @param imageData Base64编码的图像数据（可能包含data:image/png;base64,前缀）
-	 * @param gender 用户选择的性别（male/female），可选
-	 * @return 包含检测结果的JSON响应
-	 */
-	@PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Map<String, Object>>> processImage(
-			@RequestParam("image") String imageData,
-			@RequestParam(value = "gender", required = false) String gender) {
-		LocalDateTime startTime = LocalDateTime.now();
-		String requestId = UUID.randomUUID().toString();
-		logger.info("Received image processing request [RequestId: {}, Gender: {}]", requestId, gender);
+    /**
+     * 处理图像上传和Face++ API调用
+     *
+     * @param imageData Base64编码的图像数据（可能包含data:image/png;base64,前缀）
+     * @param gender 用户选择的性别（male/female），可选
+     * @return 包含检测结果的JSON响应
+     */
+    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<ApiResponse<Map<String, Object>>> processImage(
+            @RequestParam("image") String imageData,
+            @RequestParam(value = "gender", required = false) String gender) {
+        LocalDateTime startTime = LocalDateTime.now();
+        String requestId = UUID.randomUUID().toString();
+        logger.info("Received image processing request [RequestId: {}, Gender: {}]", requestId, gender);
 
-		try {
-			// 验证输入
-			imageStorageService.validateImageData(imageData);
+        try {
+            // 验证输入
+            imageStorageService.validateImageData(imageData);
 
-			// 提取Base64数据
-			String base64Data = imageStorageService.extractBase64Data(imageData);
+            // 提取Base64数据
+            String base64Data = imageStorageService.extractBase64Data(imageData);
 
-			// 生成文件名
-			String fileName = UUID.randomUUID() + ".jpeg";
+            // 生成文件名
+            String fileName = UUID.randomUUID() + ".jpeg";
 
-			// 保存图像文件（Service层会抛出异常，由GlobalExceptionHandler处理）
-			Path filePath = imageStorageService.saveBase64Image(base64Data, fileName);
-			logger.debug("Image saved: {} [RequestId: {}]", fileName, requestId);
+            // 保存图像文件（Service层会抛出异常，由GlobalExceptionHandler处理）
+            Path filePath = imageStorageService.saveBase64Image(base64Data, fileName);
+            logger.debug("Image saved: {} [RequestId: {}]", fileName, requestId);
 
-			// 调用Face++ API进行人脸检测（Service层会抛出异常，由GlobalExceptionHandler处理）
-			Map<String, Object> faceAttributes = faceRecognitionService.detectFaceAttributes(filePath);
+            // 调用Face++ API进行人脸检测（Service层会抛出异常，由GlobalExceptionHandler处理）
+            Map<String, Object> faceAttributes = faceRecognitionService.detectFaceAttributes(filePath);
+            if (faceAttributes == null) {
+                faceAttributes = new HashMap<>();
+            } else {
+                faceAttributes = new HashMap<>(faceAttributes);
+            }
 
-			// 构建图像URL
-			String imageUrl = imageStorageService.getImageUrl(fileName);
-			faceAttributes.put("img", imageUrl);
+            // 构建图像URL
+            String imageUrl = imageStorageService.getImageUrl(fileName);
+            faceAttributes.put("img", imageUrl);
 
-			// 保存用户选择的性别（用于匹配逻辑）
-			if (gender != null && !gender.trim().isEmpty()) {
-				faceAttributes.put("userGender", gender);
-			}
+            // 保存用户选择的性别（用于匹配逻辑）
+            if (gender != null && !gender.trim().isEmpty()) {
+                faceAttributes.put("userGender", gender);
+            }
 
-			// 构建成功响应
-			ApiResponse<Map<String, Object>> response = ApiResponse.success(faceAttributes, startTime);
-			response.setRequestId(requestId);
+            // 调用DeepSeek AI生成夸奖内容
+            if (!faceAttributes.isEmpty()) {
+                try {
+                    Map<String, Object> praiseAttributes = new HashMap<>(faceAttributes);
+                    String praise = deepSeekPraiseService.generatePraise(praiseAttributes);
+                    faceAttributes.put("praise", praise);
+                    logger.debug("Generated praise: {} [RequestId: {}]", praise, requestId);
+                } catch (Exception e) {
+                    logger.error("Failed to generate praise [RequestId: {}]", requestId, e);
+                    // 如果生成失败，不影响主流程，使用默认夸奖
+                    faceAttributes.put("praise", "你真棒！");
+                }
+            }
 
-			// 如果没有检测到人脸，返回失败状态（但保持兼容性）
-			if (faceAttributes.isEmpty()) {
-				response.setResult("0");
-				response.setMsg((Map<String, Object>) null);
-				response.setErrorCode("NO_FACE_DETECTED");
-				response.setErrorDetail("未检测到人脸，请确保照片中有人脸且清晰可见");
-				logger.info("No face detected in image [RequestId: {}]", requestId);
-			} else {
-				logger.info("Successfully processed image: {} [RequestId: {}, ProcessingTime: {}ms]", 
-					fileName, requestId, response.getProcessingTime());
-			}
+            // 构建成功响应
+            ApiResponse<Map<String, Object>> response = ApiResponse.success(faceAttributes, startTime);
+            response.setRequestId(requestId);
 
-			return ResponseEntity.ok()
-					.header("X-Request-Id", requestId)
-					.header("X-Processing-Time", String.valueOf(response.getProcessingTime()))
-					.header("Pragma", "No-cache")
-					.header("Cache-Control", "no-cache, no-store, must-revalidate")
-					.header("Expires", "0")
-					.body(response);
+            // 如果没有检测到人脸，返回失败状态（但保持兼容性）
+            if (faceAttributes.isEmpty()) {
+                response.setResult("0");
+                response.setMsg((Map<String, Object>) null);
+                response.setErrorCode("NO_FACE_DETECTED");
+                response.setErrorDetail("未检测到人脸，请确保照片中有人脸且清晰可见");
+                logger.info("No face detected in image [RequestId: {}]", requestId);
+            } else {
+                logger.info("Successfully processed image: {} [RequestId: {}, ProcessingTime: {}ms]", 
+                    fileName, requestId, response.getProcessingTime());
+            }
 
-		} catch (Exception e) {
-			logger.error("Error processing image [RequestId: {}]", requestId, e);
-			// 异常会被GlobalExceptionHandler处理
-			throw e;
-		}
-	}
+            return ResponseEntity.ok()
+                    .header("X-Request-Id", requestId)
+                    .header("X-Processing-Time", String.valueOf(response.getProcessingTime()))
+                    .header("Pragma", "No-cache")
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    .header("Expires", "0")
+                    .body(response);
+
+        } catch (Exception e) {
+            logger.error("Error processing image [RequestId: {}]", requestId, e);
+            // 异常会被GlobalExceptionHandler处理
+            throw e;
+        }
+    }
 }
