@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>NXNS云匹配认别系统</title>
+<style type="text/css">
+*{
+	margin:0;
+	padding:0;
+}
+body{
+	background:#000;
+} 
+.content{
+	width:1920px;
+	height:1080px;
+	margin:0 auto;
+	position:relative;
+}
+video{
+	margin:0 auto;
+	width:1200px;
+	height:900px;
+	position:absolute;
+	left:30px;
+	right:0;
+	top:50px;
+	
+}
+.ditu{
+	position:absolute;
+	left:0;
+	z-index:2;
+}
+a.boy{
+	width:431px;
+	height:272px;
+	position:absolute;
+	top:541px;
+	left:304px;
+	z-index:200;
+}
+a:hover.boy{
+	background:url(images/boy.png) no-repeat;
+}
+	
+a.girl{
+	width:431px;
+	height:272px;
+	position:absolute;
+	top:552px;
+	left:1193px;
+	z-index:200;
+}
+a:hover.girl{
+	background:url(images/girl.png) no-repeat;
+}
+.select-sex{
+	width:330px;
+	height:70px;
+	position:absolute;
+	background:#ccc;
+	left:810px;
+	top:895px;
+}
+.main-con{
+	width:650px;
+	height:316px;
+	position:absolute;
+	z-index:100;
+	left:508px;
+	top:335px;
+}
+.datas{
+	position:absolute;
+	left:1166px;
+	top:357px;
+	z-index:101;
+}
+.left-user img{
+	border-radius:50%;
+}
+.right-user img{
+	border-radius:50%;
+}
+.left-user{
+	position:absolute;
+	z-index:102;
+	left:243px;
+	top:420px;
+}
+.right-user{
+	position:absolute;
+	z-index:103;
+	left:1485px;
+	top:422px;
+}
+</style>
+</head>
+
+<body>
+<div style="width: 1920px;height: 1000px;position: relative; margin: 0px auto;"></div>
+<div class="content">
+<div class="left-user"><img src="${img}"/></div>
+<div class="right-user"><img src="images/user_1.png"/></div>
+<div class="main-con"></div>
+<div class="datas"><img src="images/data_1.png"/></div>
+<div class="ditu"><img src="images/third.png"/></div>
+</div>
+
+</body>
+</html>

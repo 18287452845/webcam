@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	Spring Boot应用通常不需要web.xml配置
+	所有配置都通过Java配置类完成（WebConfig.java等）
+	此文件保留用于兼容性，如果需要可以完全移除
+-->
+<web-app version="4.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+	https://jakarta.ee/xml/ns/jakartaee/web-app_4_0.xsd">
+	
+	<!-- Spring Boot通过注解和配置类管理所有路由和配置 -->
+	
+</web-app>

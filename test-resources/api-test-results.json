@@ -1,0 +1,58 @@
+﻿[
+    {
+        "TestId":  "TC-API-001",
+        "TestName":  "Valid Base64 image (with prefix)",
+        "Status":  "FAIL",
+        "Details":  "Error: 远程服务器返回错误: (400) 错误的请求。",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-API-002",
+        "TestName":  "Valid Base64 image (no prefix)",
+        "Status":  "FAIL",
+        "Details":  "Error: 远程服务器返回错误: (400) 错误的请求。",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-API-003",
+        "TestName":  "Empty image parameter",
+        "Status":  "PASS",
+        "Details":  "Status: 400 (expected)",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-API-004",
+        "TestName":  "Invalid Base64 data",
+        "Status":  "PASS",
+        "Details":  "Status: 400 (expected)",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-API-005",
+        "TestName":  "No face detected",
+        "Status":  "FAIL",
+        "Details":  "Error: 远程服务器返回错误: (400) 错误的请求。",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-RESULT-001",
+        "TestName":  "Valid JSON parameter",
+        "Status":  "PASS",
+        "Details":  "Status: 200",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-RESULT-002",
+        "TestName":  "Empty parameter",
+        "Status":  "FAIL",
+        "Details":  "Expected 302, got ",
+        "Timestamp":  "2025-11-30 17:41:02"
+    },
+    {
+        "TestId":  "TC-RESULT-003",
+        "TestName":  "Invalid JSON",
+        "Status":  "FAIL",
+        "Details":  "Expected 302, got ",
+        "Timestamp":  "2025-11-30 17:41:02"
+    }
+]

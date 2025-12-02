@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<swf version="7" compressed="1">
+  <Header framerate="24" frames="1">
+    <size>
+      <Rectangle left="0" right="12000" top="0" bottom="9000"/>
+    </size>
+    <tags>
+      <SetBackgroundColor>
+        <color>
+          <Color red="200" green="200" blue="200"/>
+        </color>
+      </SetBackgroundColor>
+      <DefineVideoStream objectID="1" frames="0" width="600" height="450" deblocking="0" smoothing="0" codec="0"/>
+      <DefineSprite objectID="1" frames="1">
+        <tags>
+          <End/>
+        </tags>
+      </DefineSprite>
+      <Export>
+        <symbols>
+          <Symbol objectID="1" name="clip"/>
+        </symbols>
+      </Export>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>

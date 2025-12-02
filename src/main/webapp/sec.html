@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>NXNS云匹配认别系统</title>
+<meta http-equiv="refresh" content="500000;url=third.html">
+<script src="http://www.jq22.com/jquery/1.11.1/jquery.min.js"></script>
+<script src="jquery.webcam.min.js"></script>
+<style type="text/css">
+*{
+	margin:0;
+	padding:0;
+}
+body{
+	background:#000;
+	
+}
+.content{
+	width:1600px;
+	height:1024px;
+	margin:0 auto;
+	position:relative;
+}
+video{
+	margin:0 auto;
+	width:1200px;
+	height:900px;
+	position:absolute;
+	left:30px;
+	right:0;
+	top:50px;
+	z-index: 1;
+}
+.ditu{
+	position:absolute;
+	left:0;
+	z-index:2;
+}
+a.boy{
+	width:431px;
+	height:272px;
+	position:absolute;
+	top:541px;
+	left:304px;
+	z-index:200;
+}
+a:hover.boy{
+	background:url(images/boy.png) no-repeat;
+}
+	
+a.girl{
+	width:431px;
+	height:272px;
+	position:absolute;
+	top:552px;
+	left:1193px;
+	z-index:200;
+}
+a:hover.girl{
+	background:url(images/girl.png) no-repeat;
+}
+.select-sex{
+	width:330px;
+	height:70px;
+	position:absolute;
+	background:#ccc;
+	left:810px;
+	top:895px;
+}
+#camera{
+	top: 292px;
+	left: 660px;
+	position: absolute;
+	z-index: -999999;
+}
+.back-btn a{
+	position:absolute;
+	left:350px;
+	top:135px;
+	z-index:106;
+	width:107px;
+	height:70px;
+	background:url(images/back.png) no-repeat;
+	display:block;
+}
+.back-btn a:hover{
+	background:url(images/back_over.png) no-repeat;
+}
+</style>
+<script type="text/javascript">
+
+var pos = 0, ctx = null, saveCB, image = [];  
+var w = 320;  
+var h = 240; 
+//文档加载时运行
+$(document).ready(function(){
+	//创建canvas标签
+	var canvas = document.createElement("canvas");
+	//向标签动态添加属性（添加一个指定名称和值的新属性）
+    canvas.setAttribute('width', w);  
+    canvas.setAttribute('height', h);  
+    //toDataURL()是canvas中将图片的二进制格式转为dataURL格式使用的方法。
+    //dataURL是将数据按base64进行编码，并在前面声明数据类型的一种数据结构
+    if (canvas.toDataURL) { 
+    	var j = 0;
+        ctx = canvas.getContext("2d");  
+        image = ctx.getImageData(0,0,w,h);
+        saveCB = function (data) {
+            var col = data.split(";");
+            var img = image;              
+            for (var i = 0; i < w; i++) {  
+                var tmp = parseInt(col[i]);  
+                img.data[pos + 0] = (tmp >> 16) & 0xff;  
+                img.data[pos + 1] = (tmp >> 8) & 0xff;  
+                img.data[pos + 2] = tmp & 0xff;  
+                img.data[pos + 3] = 0xff;  
+                pos +=4 ;
+            }
+            j++;
+           /*  console.log("pos="+pos);
+            console.log("j="+j);
+            console.log(4 * w * h); */
+            if (pos >= 4* w * h) {  
+                ctx.putImageData(img, 0, 0);  
+                $('#show').html('拍摄中...');
+                //通过jquery中的post将数据提交到servlet中（webcam）如果结果为true则执行function
+                $.post("webcam", { type: "data", image: canvas.toDataURL("image/jpeg")}, function (msg) { 
+                	console.log(msg);
+                	console.log(msg.result);
+                	console.log(msg.result == "1");
+                	console.log(JSON.stringify(msg.msg));
+                	if(msg.result == "1"){
+                		$('#show').html('拍摄完成...');
+                		//拍摄完成后跳转到ResultServlet中(带着msg的值需要解决乱码问题)
+                		location.href = "result?msg="+encodeURL(JSON.stringify(msg.msg));
+                	}else{
+                		$('#show').html('未检测到面部');
+                		window.location="index.html";
+                		var intDiff = parseInt(5);//倒计时总秒数量
+                		window.setInterval(function(){
+                			intDiff--;
+                			if(intDiff > 0){
+                				$('#show').html("检测倒计时"+intDiff);
+                			}else if(intDiff  == 0){
+                				webcam.capture();
+                			}
+                			
+                		}, 1000);
+                	}
+                });  
+                pos = 0;  
+            }  
+        };  
+
+    } else {  
+        saveCB = function (data) { 
+            image.push(data);
+            pos += 4 * h;  
+            if (pos >= 4 * w * h) {
+            	console.log(msg);
+            	$('#second_show').html('拍摄中...');
+                $.post("webcam", { type: "pixel", image: image.join('|') }, function (msg) {  
+                	console.log(msg);
+                	console.log(msg.result);
+                	console.log(msg.result == "1");
+                	console.log(JSON.stringify(msg.msg));
+                	if(msg.result == "1"){
+                		$('#show').html('拍摄完成...');
+                		//var mm=JSON.stringify(msg.msg)
+                		location.href = "result?msg="+encodeurl(JSON.stringify(msg.msg));
+                	}else{
+                		$('#show').html('未检测到面部');
+                		window.location="index.html";
+                		var intDiff = parseInt(5);//倒计时总秒数量
+                		window.setInterval(function(){
+                			intDiff--;
+                			if(intDiff > 0){
+                				$('#show').html("检测倒计时"+intDiff);
+                			}else if(intDiff  == 0){
+                				webcam.capture();
+                			}
+                			
+                		}, 1000);
+                		
+                	}
+                });  
+                pos = 0;  
+            }  
+        };  
+    }  
+});
+function callFlash() {  
+    $("#camera").webcam({  //width:400,height:440,
+        width: 600,  
+        height: 450,  
+        mode: "callback",  
+        swffile: "jscam.swf" ,  
+        onTick: function () { },  
+        onSave: saveCB,  
+        onCapture: function () {  
+            webcam.save();  
+        },  
+        debug: function () { console.log(type + ": " + string); },  
+        onLoad: function () { }  
+    });  
+}  
+setTimeout(callFlash, 500);
+var intDiff = parseInt(30);//倒计时总秒数量
+window.setInterval(function(){
+	intDiff--;
+	if(intDiff > 0){
+		$('#show').html("检测倒计时"+intDiff);
+	}else if(intDiff  == 0){
+		webcam.capture();
+	}
+	
+}, 1000);
+</script>
+</head>
+<body>
+<div style="width: 1920px;height: 1000px; position: relative; margin: 0px auto;"></div>
+<div class="content">
+<div class="back-btn"><a href="index.html"></a></div>
+<video src="1.wav" autoplay loop>您所用的浏览器不支持改标签</video>
+<div style="width:320;height: 240px; position: absolute;top: 335px;left:850px;z-index: 999999;">
+	<img alt="" src="saomiao.gif">
+</div>
+<div class="ditu">
+	<div id="camera" ></div> /
+	<img src="images/sec.png" style="z-index:9999;" />
+	<div  style="top:883px;background-color:#000205;height: 80px;width: 500px;left: 748px;position: absolute;color: #02B2EA;font-size: 22px;margin: 0px;">
+		<h1 id="show" style="font-size: 70px;margin: 0px;">检测倒计时5</h1>
+	</div>
+</div>
+</div>
+</body>
+</html>

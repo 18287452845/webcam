@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(powershell -Command \"New-Item -ItemType Directory -Force -Path ''C:\\Users\\ly182\\.claude\\plans'' | Out-Null; echo ''Directory ready''\")",
+      "Bash(powershell -Command \"Get-Content ''''D:\\My Documents\\claude_prj\\webcam\\src\\main\\webapp\\sec.html'''' | Select-String -Pattern ''''api_key|api_secret|192\\.168''''\")",
+      "Bash(mvn test -q)",
+      "Bash(mvn:*)",
+      "Bash(find:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
