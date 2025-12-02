@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import webcam.MapUtil;
+import webcam.service.CelebrityPhotoService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,11 +30,13 @@ public class ResultController {
 	private static final Logger logger = LoggerFactory.getLogger(ResultController.class);
 	
 	private final ObjectMapper objectMapper;
+	private final CelebrityPhotoService celebrityPhotoService;
 	private final Random random = new Random();
 
 	@Autowired
-	public ResultController(ObjectMapper objectMapper) {
+	public ResultController(ObjectMapper objectMapper, CelebrityPhotoService celebrityPhotoService) {
 		this.objectMapper = objectMapper;
+		this.celebrityPhotoService = celebrityPhotoService;
 	}
 
 	/**
@@ -74,22 +77,9 @@ public class ResultController {
 				// 优先使用用户选择的性别进行匹配
 				String userGender = jsonObject.has("userGender") ? jsonObject.get("userGender").asText() : null;
 
-				// 根据用户选择的性别选择匹配图片
-				int randomNum = random.nextInt(10) + 1;
-				if ("male".equals(userGender)) {
-					// 用户选择了男性，匹配女性照片
-					model.addAttribute("ppei", "female/" + randomNum + ".png");
-				} else if ("female".equals(userGender)) {
-					// 用户选择了女性，匹配男性照片
-					model.addAttribute("ppei", "male/" + randomNum + ".png");
-				} else {
-					// 如果没有用户选择性别，使用Face++检测结果
-					if ("男性".equals(gender)) {
-						model.addAttribute("ppei", "female/" + randomNum + ".png");
-					} else {
-						model.addAttribute("ppei", "male/" + randomNum + ".png");
-					}
-				}
+				// 获取明星照片URL
+				String celebrityPhotoUrl = selectCelebrityPhoto(userGender, gender);
+				model.addAttribute("ppei", celebrityPhotoUrl);
 			}
 			if (jsonObject.has("age")) {
 				model.addAttribute("age", jsonObject.get("age").asText());
@@ -129,21 +119,9 @@ public class ResultController {
 				// 优先使用用户选择的性别
 				String userGender = (String) resultData.get("userGender");
 
-				int randomNum = random.nextInt(10) + 1;
-				if ("male".equals(userGender)) {
-					// 用户选择了男性，匹配女性照片
-					response.put("ppei", "female/" + randomNum + ".png");
-				} else if ("female".equals(userGender)) {
-					// 用户选择了女性，匹配男性照片
-					response.put("ppei", "male/" + randomNum + ".png");
-				} else {
-					// 如果没有用户选择性别，使用Face++检测结果
-					if ("男性".equals(gender)) {
-						response.put("ppei", "female/" + randomNum + ".png");
-					} else {
-						response.put("ppei", "male/" + randomNum + ".png");
-					}
-				}
+				// 获取明星照片URL
+				String celebrityPhotoUrl = selectCelebrityPhoto(userGender, gender);
+				response.put("ppei", celebrityPhotoUrl);
 			}
 
 			// 随机生成描述
@@ -158,6 +136,41 @@ public class ResultController {
 			response.put("error", "处理结果数据时发生错误: " + e.getMessage());
 			return response;
 		}
+	}
+
+	/**
+	 * 根据用户性别选择匹配的明星照片
+	 * 修复逻辑：男性匹配男性明星，女性匹配女性明星
+	 * 
+	 * @param userGender 用户选择的性别（male/female）
+	 * @param detectedGender Face++检测的性别（男性/女性）
+	 * @return 明星照片URL
+	 */
+	private String selectCelebrityPhoto(String userGender, String detectedGender) {
+		String matchGender;
+		
+		// 确定匹配的性别（同性匹配）
+		if ("male".equals(userGender)) {
+			matchGender = "male";
+		} else if ("female".equals(userGender)) {
+			matchGender = "female";
+		} else if ("男性".equals(detectedGender)) {
+			matchGender = "male";
+		} else {
+			matchGender = "female";
+		}
+
+		// 获取明星照片URL
+		String celebrityPhotoUrl = celebrityPhotoService.getRandomCelebrityPhoto(matchGender);
+		
+		// 如果获取失败，使用默认本地图片作为降级方案
+		if (celebrityPhotoUrl == null || celebrityPhotoUrl.isEmpty()) {
+			int randomNum = random.nextInt(10) + 1;
+			celebrityPhotoUrl = matchGender + "/" + randomNum + ".png";
+			logger.warn("Failed to get celebrity photo, using fallback local image: {}", celebrityPhotoUrl);
+		}
+		
+		return celebrityPhotoUrl;
 	}
 }
 
