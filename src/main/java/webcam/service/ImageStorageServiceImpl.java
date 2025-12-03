@@ -70,12 +70,15 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             return null;
         }
 
+        String base64Data = imageData;
+
         // 移除可能的data:image前缀
         if (imageData.contains(",")) {
-            return imageData.substring(imageData.indexOf(",") + 1);
+            base64Data = imageData.substring(imageData.indexOf(",") + 1);
         }
 
-        return imageData;
+        // 清理空白字符，避免由于换行、空格导致的解码失败
+        return base64Data.replaceAll("\\s+", "");
     }
 
     @Override
@@ -97,9 +100,16 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             throw new IllegalArgumentException("无效的图像数据格式");
         }
 
-        // 可以添加更多验证，如检查Base64字符串长度等
-        if (base64Data.length() < 100) {
+        // 降低最小长度要求，避免误判小图片或缩略图
+        // Base64编码后约为原始数据的1.33倍，100字节约为75字节原始数据，这太小了
+        if (base64Data.length() < 50) {
             throw new IllegalArgumentException("图像数据过小，可能不是有效的图像");
+        }
+        
+        // 验证Base64字符合法性（可选，解码时也会验证）
+        if (!base64Data.matches("^[A-Za-z0-9+/]*={0,2}$")) {
+            logger.warn("Base64 data contains invalid characters");
+            throw new IllegalArgumentException("图像数据包含非法字符");
         }
     }
 }

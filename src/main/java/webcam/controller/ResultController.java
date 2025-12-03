@@ -149,10 +149,11 @@ public class ResultController {
     /**
      * 根据用户性别选择匹配的明星照片
      * 修复逻辑：男性匹配男性明星，女性匹配女性明星
+     * 使用本地图片，避免外部CDN失效或防盗链问题
      * 
      * @param userGender 用户选择的性别（male/female）
      * @param detectedGender Face++检测的性别（男性/女性）
-     * @return 明星照片URL
+     * @return 明星照片URL（本地路径）
      */
     private String selectCelebrityPhoto(String userGender, String detectedGender) {
         String matchGender;
@@ -168,14 +169,16 @@ public class ResultController {
             matchGender = "female";
         }
 
-        // 获取明星照片URL
+        // 获取明星照片URL（现在配置为本地图片，更可靠）
         String celebrityPhotoUrl = celebrityPhotoService.getRandomCelebrityPhoto(matchGender);
         
-        // 如果获取失败，使用默认本地图片作为降级方案
+        // 如果服务返回null或空字符串（异常情况），使用降级方案
         if (celebrityPhotoUrl == null || celebrityPhotoUrl.isEmpty()) {
             int randomNum = random.nextInt(10) + 1;
-            celebrityPhotoUrl = matchGender + "/" + randomNum + ".png";
-            logger.warn("Failed to get celebrity photo, using fallback local image: {}", celebrityPhotoUrl);
+            celebrityPhotoUrl = "/" + matchGender + "/" + randomNum + ".png";
+            logger.warn("CelebrityPhotoService returned null/empty, using fallback: {}", celebrityPhotoUrl);
+        } else {
+            logger.debug("Selected celebrity photo: {}", celebrityPhotoUrl);
         }
         
         return celebrityPhotoUrl;

@@ -20,11 +20,11 @@
             <video class="result-video" src="2.wav" id="video" autoplay loop muted>您所用的浏览器不支持视频标签</video>
             
             <div class="user-image left">
-                <img src="${img}" alt="用户照片" width="205" height="205">
+                <img src="${img}" alt="用户照片" width="205" height="205" onerror="this.style.display='none';">
             </div>
             
             <div class="user-image right">
-                <img src="${ppei}" alt="匹配照片" width="205" height="205">
+                <img src="${ppei}" alt="匹配照片" width="205" height="205" data-match-gender="${gender == '男性' ? 'male' : 'female'}" onerror="handleImageError(this);">
             </div>
             
             <div class="main-content">
@@ -49,6 +49,50 @@
     <script>
         (function() {
             'use strict';
+            
+            const contextPath = '${pageContext.request.contextPath}';
+            
+            /**
+             * 将本地相对路径转换为带上下文路径的完整URL
+             */
+            function buildLocalImagePath(relativePath) {
+                if (!relativePath) {
+                    return contextPath || '/';
+                }
+
+                let normalizedPath = relativePath.trim();
+                if (!normalizedPath.startsWith('/')) {
+                    normalizedPath = '/' + normalizedPath;
+                }
+
+                if (!contextPath || contextPath === '/') {
+                    return normalizedPath;
+                }
+                
+                return contextPath + normalizedPath;
+            }
+            
+            /**
+             * 处理明星照片加载错误，使用本地备用图片
+             */
+            window.handleImageError = function(img) {
+                console.error('Failed to load celebrity photo:', img.src);
+                
+                // 如果已经尝试过本地图片，不再重试，避免循环
+                if (img.dataset.retried) {
+                    console.error('Local fallback image also failed to load');
+                    img.style.display = 'none';
+                    return;
+                }
+                
+                const gender = img.dataset.matchGender || 'male';
+                const randomNum = Math.floor(Math.random() * 10) + 1;
+                const fallbackSrc = buildLocalImagePath(`${gender}/${randomNum}.png`);
+                
+                console.log('Falling back to local image:', fallbackSrc);
+                img.dataset.retried = 'true';
+                img.src = fallbackSrc;
+            };
             
             /**
              * 逐字显示文本动画
