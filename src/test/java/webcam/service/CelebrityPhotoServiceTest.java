@@ -22,14 +22,16 @@ class CelebrityPhotoServiceTest {
     void testGetRandomMaleCelebrityPhoto() {
         String photoUrl = celebrityPhotoService.getRandomCelebrityPhoto("male");
         assertNotNull(photoUrl, "Male celebrity photo URL should not be null");
-        assertTrue(photoUrl.startsWith("http"), "Photo URL should be a valid URL");
+        assertTrue(photoUrl.startsWith("/male/"), "Photo URL should be a local male photo path");
+        assertTrue(photoUrl.endsWith(".png"), "Photo URL should end with .png");
     }
 
     @Test
     void testGetRandomFemaleCelebrityPhoto() {
         String photoUrl = celebrityPhotoService.getRandomCelebrityPhoto("female");
         assertNotNull(photoUrl, "Female celebrity photo URL should not be null");
-        assertTrue(photoUrl.startsWith("http"), "Photo URL should be a valid URL");
+        assertTrue(photoUrl.startsWith("/female/"), "Photo URL should be a local female photo path");
+        assertTrue(photoUrl.endsWith(".png"), "Photo URL should end with .png");
     }
 
     @Test

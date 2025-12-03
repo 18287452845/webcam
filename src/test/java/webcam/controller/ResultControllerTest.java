@@ -45,9 +45,9 @@ class ResultControllerTest {
 
     @Test
     void testShowResult_MaleUser_MatchesMaleCelebrity() throws Exception {
-        // Given: Mock male celebrity photo
+        // Given: Mock male celebrity photo (now uses local images)
         when(celebrityPhotoService.getRandomCelebrityPhoto("male"))
-            .thenReturn("https://example.com/male-celeb.jpg");
+            .thenReturn("/male/5.png");
 
         String msgJson = "{\"gender\":\"男性\",\"userGender\":\"male\",\"img\":\"test.jpg\",\"age\":\"25\"}";
 
@@ -57,14 +57,14 @@ class ResultControllerTest {
         // Then: Should match male celebrity
         assertEquals("result", viewName);
         verify(celebrityPhotoService).getRandomCelebrityPhoto("male");
-        verify(model).addAttribute(eq("ppei"), eq("https://example.com/male-celeb.jpg"));
+        verify(model).addAttribute(eq("ppei"), eq("/male/5.png"));
     }
 
     @Test
     void testShowResult_FemaleUser_MatchesFemaleCelebrity() throws Exception {
-        // Given: Mock female celebrity photo
+        // Given: Mock female celebrity photo (now uses local images)
         when(celebrityPhotoService.getRandomCelebrityPhoto("female"))
-            .thenReturn("https://example.com/female-celeb.jpg");
+            .thenReturn("/female/3.png");
 
         String msgJson = "{\"gender\":\"女性\",\"userGender\":\"female\",\"img\":\"test.jpg\",\"age\":\"23\"}";
 
@@ -74,14 +74,14 @@ class ResultControllerTest {
         // Then: Should match female celebrity
         assertEquals("result", viewName);
         verify(celebrityPhotoService).getRandomCelebrityPhoto("female");
-        verify(model).addAttribute(eq("ppei"), eq("https://example.com/female-celeb.jpg"));
+        verify(model).addAttribute(eq("ppei"), eq("/female/3.png"));
     }
 
     @Test
     void testShowResult_NoUserGender_UseDetectedGender() throws Exception {
         // Given: No user gender, use detected gender
         when(celebrityPhotoService.getRandomCelebrityPhoto("male"))
-            .thenReturn("https://example.com/male-celeb.jpg");
+            .thenReturn("/male/7.png");
 
         String msgJson = "{\"gender\":\"男性\",\"img\":\"test.jpg\",\"age\":\"30\"}";
 
@@ -95,9 +95,9 @@ class ResultControllerTest {
 
     @Test
     void testGetResultJson_MaleUser() {
-        // Given: Mock male celebrity photo
+        // Given: Mock male celebrity photo (now uses local images)
         when(celebrityPhotoService.getRandomCelebrityPhoto("male"))
-            .thenReturn("https://example.com/male-celeb.jpg");
+            .thenReturn("/male/2.png");
 
         Map<String, Object> resultData = new HashMap<>();
         resultData.put("gender", "男性");
@@ -109,15 +109,15 @@ class ResultControllerTest {
 
         // Then: Should contain male celebrity photo
         assertNotNull(response);
-        assertEquals("https://example.com/male-celeb.jpg", response.get("ppei"));
+        assertEquals("/male/2.png", response.get("ppei"));
         verify(celebrityPhotoService).getRandomCelebrityPhoto("male");
     }
 
     @Test
     void testGetResultJson_FemaleUser() {
-        // Given: Mock female celebrity photo
+        // Given: Mock female celebrity photo (now uses local images)
         when(celebrityPhotoService.getRandomCelebrityPhoto("female"))
-            .thenReturn("https://example.com/female-celeb.jpg");
+            .thenReturn("/female/8.png");
 
         Map<String, Object> resultData = new HashMap<>();
         resultData.put("gender", "女性");
@@ -129,7 +129,7 @@ class ResultControllerTest {
 
         // Then: Should contain female celebrity photo
         assertNotNull(response);
-        assertEquals("https://example.com/female-celeb.jpg", response.get("ppei"));
+        assertEquals("/female/8.png", response.get("ppei"));
         verify(celebrityPhotoService).getRandomCelebrityPhoto("female");
     }
 
@@ -143,9 +143,9 @@ class ResultControllerTest {
         // When: Show result
         String viewName = resultController.showResult(msgJson, model);
 
-        // Then: Should fallback to local image
+        // Then: Should fallback to local image with correct path prefix
         assertEquals("result", viewName);
-        verify(model).addAttribute(eq("ppei"), contains("male/"));
+        verify(model).addAttribute(eq("ppei"), contains("/male/"));
         verify(model).addAttribute(eq("ppei"), endsWith(".png"));
     }
 }
