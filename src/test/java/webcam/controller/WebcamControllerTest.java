@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import webcam.service.DeepSeekPraiseService;
 import webcam.service.FaceRecognitionService;
 import webcam.service.ImageStorageService;
 
@@ -41,6 +42,9 @@ class WebcamControllerTest {
     @MockBean
     private FaceRecognitionService faceRecognitionService;
 
+    @MockBean
+    private DeepSeekPraiseService deepSeekPraiseService;
+
     private String validBase64Image;
 
     @BeforeEach
@@ -67,6 +71,7 @@ class WebcamControllerTest {
         when(imageStorageService.saveBase64Image(anyString(), anyString())).thenReturn(mockPath);
         when(imageStorageService.getImageUrl(anyString())).thenReturn("http://localhost:8080/upload/test.jpeg");
         when(faceRecognitionService.detectFaceAttributes(any(Path.class))).thenReturn(faceAttributes);
+        when(deepSeekPraiseService.generatePraise(any())).thenReturn("你的笑容真好看，给人一种很舒服的感觉！");
 
         // 执行测试
         mockMvc.perform(post("/webcam")
@@ -76,7 +81,8 @@ class WebcamControllerTest {
                 .andExpect(jsonPath("$.result").value("1"))
                 .andExpect(jsonPath("$.msg.gender").value("男性"))
                 .andExpect(jsonPath("$.msg.age").value(25))
-                .andExpect(jsonPath("$.msg.smile").value("微笑"));
+                .andExpect(jsonPath("$.msg.smile").value("微笑"))
+                .andExpect(jsonPath("$.msg.praise").value("你的笑容真好看，给人一种很舒服的感觉！"));
     }
 
     @Test
