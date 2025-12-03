@@ -5,11 +5,26 @@ All notable changes to this project will be documented in this file.
 ## [2.0.2-SNAPSHOT] - 2025-12-03
 
 ### Changed
-- README.md：整合DeepSeek AI夸奖、同性明星匹配以及配置说明，提供单一可信的项目文档
+- **README.md 重大更新**：全面更新文档以反映最新的AI自动化功能
+  - 更新"核心功能"说明，强调AI自动性别检测和智能匹配
+  - 更新"主要特性"，移除过时的手动性别选择描述
+  - 新增"用户使用流程"章节，清晰展示从拍照到结果展示的完整流程
+  - 更新"智能体验增强"章节，详细说明AI自动检测和同性匹配逻辑
+  - 更新API文档，移除已废弃的gender参数说明
+  - 更新"从旧版本迁移"章节，说明性别检测方式的变更
+  - 完善项目结构说明，标注capture.html为legacy页面
+  - 添加"最新变更"章节，方便用户快速了解版本更新
+- 整合DeepSeek AI夸奖、同性明星匹配以及配置说明，提供单一可信的项目文档
 
 ### Removed
 - 删除 `DOCS.md`、`USAGE_EXAMPLE.md`、`OPTIMIZATION.md`、`FEATURE_SUMMARY.md`、`README_DEEPSEEK.md` 等重复/过期文档，内容已合并入主README
 - 移除未使用的图片 `home_1920bg123.png`
+
+### Documentation Highlights
+- ✨ 强调完全自动化的用户体验（无需手动选择性别）
+- 🎯 清晰说明Face++ API自动检测性别的工作原理
+- 📊 详细展示从拍照到结果展示的8步完整流程
+- 🔄 更新API文档，移除已废弃的gender参数说明
 
 ## [2.0.1-SNAPSHOT] - 2025-12-02
 
