@@ -29,7 +29,9 @@
 - 📷 **实时摄像头访问** - 使用HTML5 MediaDevices API，无需Flash插件
 - 🔍 **人脸识别** - 集成Face++ API进行人脸检测和属性分析
 - 📊 **属性分析** - 识别性别、年龄、笑容、眼镜状态等
-- 🎨 **匹配展示** - 根据识别结果展示匹配信息和描述
+- 🎭 **明星照片匹配** - 根据用户性别匹配同性中国明星照片（从网络CDN获取）
+- 🤖 **AI智能夸奖** - 集成DeepSeek AI大模型，生成个性化夸奖内容
+- 🎨 **动态结果展示** - 打字机动画效果展示识别结果和AI夸奖
 
 ## ✨ 主要特性
 
@@ -38,6 +40,8 @@
 - ✅ **RESTful API** - 清晰的API设计，易于集成和扩展
 - ✅ **配置外部化** - API密钥等敏感信息通过配置文件管理
 - ✅ **完善的错误处理** - 友好的错误提示和日志记录
+- 🤝 **同性明星匹配** - 根据用户选择的性别随机匹配同性中国明星照片
+- 🤖 **DeepSeek AI夸奖** - 调用DeepSeek大模型生成60-80字个性化夸奖
 - ✅ **响应式设计** - 支持不同屏幕尺寸（主要针对1920x1080优化）
 - ✅ **安全考虑** - 输入验证、文件大小限制等安全措施
 
@@ -58,6 +62,7 @@
 
 ### 外部服务
 - **Face++ API** - 人脸识别服务
+- **DeepSeek AI** - 个性化夸奖内容生成
 
 ## 🚀 快速开始
 
@@ -67,6 +72,7 @@
 - **Maven 3.6+**
 - **现代浏览器**（Chrome 53+, Firefox 36+, Edge 12+, Safari 11+）
 - **Face++ API密钥**（[申请地址](https://www.faceplusplus.com.cn/)）
+- **DeepSeek API密钥**（可选，[申请地址](https://platform.deepseek.com/)）
 
 ### 安装步骤
 
@@ -80,15 +86,19 @@
 
    编辑 `src/main/resources/application.properties`：
    ```properties
-   faceplusplus.api.key=your_api_key
-   faceplusplus.api.secret=your_api_secret
+   faceplusplus.api.key=your_faceplusplus_api_key
+   faceplusplus.api.secret=your_faceplusplus_api_secret
+   deepseek.api.key=your_deepseek_api_key
    ```
    
    或使用环境变量：
    ```bash
-   export FACEPLUSPLUS_API_KEY=your_api_key
-   export FACEPLUSPLUS_API_SECRET=your_api_secret
+   export FACEPLUSPLUS_API_KEY=your_faceplusplus_api_key
+   export FACEPLUSPLUS_API_SECRET=your_faceplusplus_api_secret
+   export DEEPSEEK_API_KEY=your_deepseek_api_key
    ```
+
+   > DeepSeek API Key 用于生成AI夸奖，未配置时系统会自动回退到内置夸奖文案。
 
 3. **编译项目**
    ```bash
@@ -119,7 +129,14 @@ webcam/
 │   │   │   │   ├── WebConfig.java               # Web配置（静态资源、视图解析）
 │   │   │   │   ├── RestTemplateConfig.java      # HTTP客户端配置
 │   │   │   │   ├── FacePlusPlusProperties.java  # Face++配置属性
+│   │   │   │   ├── DeepSeekProperties.java      # DeepSeek AI配置属性
+│   │   │   │   ├── CelebrityProperties.java     # 明星照片配置属性
 │   │   │   │   └── UploadProperties.java        # 文件上传配置属性
+│   │   │   ├── service/                         # 服务层
+│   │   │   │   ├── FaceRecognitionService.java  # 人脸识别服务
+│   │   │   │   ├── ImageStorageService.java     # 图像存储服务
+│   │   │   │   ├── CelebrityPhotoService.java   # 明星照片服务
+│   │   │   │   └── DeepSeekPraiseService.java   # AI夸奖服务
 │   │   │   └── MapUtil.java                     # 工具类（数据映射）
 │   │   ├── resources/
 │   │   │   ├── application.properties           # 主配置文件
@@ -143,6 +160,19 @@ webcam/
 └── .gitignore                                   # Git忽略配置
 ```
 
+## 🌟 智能体验增强
+
+### 同性明星匹配
+- 首页选择性别后会将 `gender=male|female` 参数一路传递到结果页，实现**同性匹配**体验
+- `CelebrityPhotoService` 会从配置的中国明星CDN列表中随机返回照片URL，默认内置 10 位男明星 + 10 位女明星
+- 如果网络图片不可用，系统会自动降级为本地 `male/*.png` 或 `female/*.png` 静态资源，保证功能稳定
+
+### DeepSeek AI夸奖
+- `DeepSeekPraiseService` 会根据 Face++ 返回的性别、年龄、笑容、眼镜等属性构建提示词，调用 DeepSeek Chat API 生成 60-80 字的个性化夸奖
+- 所有请求都经过超时重试与异常捕获，失败时会自动使用预置的夸奖文本，不阻塞主流程
+- 未配置 `DEEPSEEK_API_KEY` 时依然可以使用项目，系统会直接使用预置夸奖内容
+- 想了解更详细的提示词格式、异常处理与测试用例，可阅读 [DEEPSEEK_INTEGRATION.md](DEEPSEEK_INTEGRATION.md)
+
 ## 📡 API文档
 
 ### POST /webcam
@@ -153,6 +183,7 @@ webcam/
 
 **请求参数**:
 - `image` (String, 必需): Base64编码的图像数据，支持 `data:image/jpeg;base64,` 前缀
+- `gender` (String, 可选): `male` 或 `female`，用于明星匹配和结果展示
 
 **响应格式**: `application/json`
 
@@ -166,7 +197,8 @@ webcam/
     "gender": "男性",
     "age": 25,
     "smile": "微笑",
-    "eyestatus": "不带眼镜并且睁眼"
+    "eyestatus": "不带眼镜并且睁眼",
+    "praise": "你的笑容很有感染力，给人一种很舒服的感觉。25岁的年纪正值青春，眼神清澈明亮，整体气质看起来精神饱满、充满活力！"
   }
 }
 ```
@@ -228,6 +260,23 @@ faceplusplus.api.secret=${FACEPLUSPLUS_API_SECRET:default_secret}
 faceplusplus.api.return-attributes=gender,age,smiling,eyestatus,glass,headpose,facequality,blur
 faceplusplus.api.return-landmark=0
 ```
+
+#### DeepSeek AI配置
+```properties
+deepseek.api.url=https://api.deepseek.com/v1/chat/completions
+deepseek.api.key=${DEEPSEEK_API_KEY:}
+deepseek.api.model=deepseek-chat
+deepseek.api.temperature=0.7
+deepseek.api.max-tokens=500
+```
+> 未配置 `deepseek.api.key` 时系统会自动降级为预置夸奖文案。
+
+#### 明星照片配置（可选）
+```properties
+celebrity.male-photos[0]=https://img1.baidu.com/it/u=2839653127,3970469241&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500
+celebrity.female-photos[0]=https://img0.baidu.com/it/u=3775428652,2868156394&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500
+```
+> 不配置时会使用代码内置的 10 张男性 + 10 张女性明星照片。
 
 #### 日志配置
 ```properties
@@ -341,6 +390,14 @@ docker run -p 8080:8080 webcam-app
 - 确保 `upload/` 目录存在且有写入权限
 - 检查文件大小是否超过限制（默认10MB）
 - 查看应用日志
+
+#### 6. DeepSeek AI夸奖未生成
+**错误**: 结果页面没有显示个性化夸奖
+
+**解决**:
+- 检查 `deepseek.api.key` 是否配置
+- 未配置时会自动使用预置夸奖文案，不影响功能使用
+- 如果希望使用AI夸奖，请到 https://platform.deepseek.com/ 申请API Key
 
 ### 调试模式
 
@@ -479,6 +536,13 @@ mvn verify
 - ⚡ 性能优化
 - 🔒 安全改进
 
+## 📚 更多文档
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献流程和代码规范
+- [CHANGELOG.md](CHANGELOG.md) - 历史版本与主要改动
+- [CLAUDE.md](CLAUDE.md) - 面向AI助手的项目说明
+- [DEEPSEEK_INTEGRATION.md](DEEPSEEK_INTEGRATION.md) - DeepSeek AI功能的深入解析
+
 ## 📄 许可证
 
 [添加您的许可证信息]
@@ -492,10 +556,11 @@ mvn verify
 ## 🙏 致谢
 
 - [Face++](https://www.faceplusplus.com.cn/) - 提供人脸识别API服务
+- [DeepSeek](https://www.deepseek.com/) - 提供AI大模型服务
 - [Spring Boot](https://spring.io/projects/spring-boot) - 优秀的Java应用框架
 - 所有贡献者和用户
 
 ---
 
-**最后更新**: 2025-11-29  
+**最后更新**: 2025-12-03  
 **版本**: 2.0.0-SNAPSHOT
