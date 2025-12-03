@@ -49,7 +49,7 @@ class ResultControllerTest {
         when(celebrityPhotoService.getRandomCelebrityPhoto("male"))
             .thenReturn("/male/5.png");
 
-        String msgJson = "{\"gender\":\"男性\",\"userGender\":\"male\",\"img\":\"test.jpg\",\"age\":\"25\"}";
+        String msgJson = "{\"gender\":\"男性\",\"img\":\"test.jpg\",\"age\":\"25\"}";
 
         // When: Show result
         String viewName = resultController.showResult(msgJson, model);
@@ -66,7 +66,7 @@ class ResultControllerTest {
         when(celebrityPhotoService.getRandomCelebrityPhoto("female"))
             .thenReturn("/female/3.png");
 
-        String msgJson = "{\"gender\":\"女性\",\"userGender\":\"female\",\"img\":\"test.jpg\",\"age\":\"23\"}";
+        String msgJson = "{\"gender\":\"女性\",\"img\":\"test.jpg\",\"age\":\"23\"}";
 
         // When: Show result
         String viewName = resultController.showResult(msgJson, model);
@@ -78,8 +78,8 @@ class ResultControllerTest {
     }
 
     @Test
-    void testShowResult_NoUserGender_UseDetectedGender() throws Exception {
-        // Given: No user gender, use detected gender
+    void testShowResult_UseDetectedGender() throws Exception {
+        // Given: Use Face++ detected gender
         when(celebrityPhotoService.getRandomCelebrityPhoto("male"))
             .thenReturn("/male/7.png");
 
@@ -94,14 +94,13 @@ class ResultControllerTest {
     }
 
     @Test
-    void testGetResultJson_MaleUser() {
+    void testGetResultJson_MaleDetected() {
         // Given: Mock male celebrity photo (now uses local images)
         when(celebrityPhotoService.getRandomCelebrityPhoto("male"))
             .thenReturn("/male/2.png");
 
         Map<String, Object> resultData = new HashMap<>();
         resultData.put("gender", "男性");
-        resultData.put("userGender", "male");
         resultData.put("img", "test.jpg");
 
         // When: Get result JSON
@@ -114,14 +113,13 @@ class ResultControllerTest {
     }
 
     @Test
-    void testGetResultJson_FemaleUser() {
+    void testGetResultJson_FemaleDetected() {
         // Given: Mock female celebrity photo (now uses local images)
         when(celebrityPhotoService.getRandomCelebrityPhoto("female"))
             .thenReturn("/female/8.png");
 
         Map<String, Object> resultData = new HashMap<>();
         resultData.put("gender", "女性");
-        resultData.put("userGender", "female");
         resultData.put("img", "test.jpg");
 
         // When: Get result JSON
@@ -138,7 +136,7 @@ class ResultControllerTest {
         // Given: Celebrity photo service returns null
         when(celebrityPhotoService.getRandomCelebrityPhoto(anyString())).thenReturn(null);
 
-        String msgJson = "{\"gender\":\"男性\",\"userGender\":\"male\",\"img\":\"test.jpg\"}";
+        String msgJson = "{\"gender\":\"男性\",\"img\":\"test.jpg\"}";
 
         // When: Show result
         String viewName = resultController.showResult(msgJson, model);

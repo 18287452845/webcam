@@ -53,16 +53,14 @@ public class WebcamController {
      * 处理图像上传和Face++ API调用
      *
      * @param imageData Base64编码的图像数据（可能包含data:image/png;base64,前缀）
-     * @param gender 用户选择的性别（male/female），可选
      * @return 包含检测结果的JSON响应
      */
     @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<ApiResponse<Map<String, Object>>> processImage(
-            @RequestParam("image") String imageData,
-            @RequestParam(value = "gender", required = false) String gender) {
+            @RequestParam("image") String imageData) {
         LocalDateTime startTime = LocalDateTime.now();
         String requestId = UUID.randomUUID().toString();
-        logger.info("Received image processing request [RequestId: {}, Gender: {}]", requestId, gender);
+        logger.info("Received image processing request [RequestId: {}]", requestId);
 
         try {
             // 验证输入
@@ -89,11 +87,6 @@ public class WebcamController {
             // 构建图像URL
             String imageUrl = imageStorageService.getImageUrl(fileName);
             faceAttributes.put("img", imageUrl);
-
-            // 保存用户选择的性别（用于匹配逻辑）
-            if (gender != null && !gender.trim().isEmpty()) {
-                faceAttributes.put("userGender", gender);
-            }
 
             // 调用DeepSeek AI生成夸奖内容
             if (!faceAttributes.isEmpty()) {
