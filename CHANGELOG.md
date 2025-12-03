@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.2-SNAPSHOT] - 2025-12-03
+
+### Changed
+- README.md：整合DeepSeek AI夸奖、同性明星匹配以及配置说明，提供单一可信的项目文档
+
+### Removed
+- 删除 `DOCS.md`、`USAGE_EXAMPLE.md`、`OPTIMIZATION.md`、`FEATURE_SUMMARY.md`、`README_DEEPSEEK.md` 等重复/过期文档，内容已合并入主README
+- 移除未使用的图片 `home_1920bg123.png`
+
 ## [2.0.1-SNAPSHOT] - 2025-12-02
 
 ### Fixed
@@ -31,8 +40,6 @@ All notable changes to this project will be documented in this file.
   - 增强错误处理和日志记录
 
 ### Documentation
-- 新增 `OPTIMIZATION.md` - 详细的优化说明文档
-- 新增 `USAGE_EXAMPLE.md` - 使用示例和API文档
 - 新增 `CHANGELOG.md` - 变更日志
 
 ### Technical Details
@@ -44,8 +51,6 @@ src/main/java/webcam/service/CelebrityPhotoService.java
 src/main/java/webcam/service/impl/CelebrityPhotoServiceImpl.java
 src/test/java/webcam/service/CelebrityPhotoServiceTest.java
 src/test/java/webcam/controller/ResultControllerTest.java
-OPTIMIZATION.md
-USAGE_EXAMPLE.md
 CHANGELOG.md
 ```
 
