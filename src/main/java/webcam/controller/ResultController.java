@@ -74,11 +74,8 @@ public class ResultController {
                 String gender = jsonObject.get("gender").asText();
                 model.addAttribute("gender", gender);
 
-                // 优先使用用户选择的性别进行匹配
-                String userGender = jsonObject.has("userGender") ? jsonObject.get("userGender").asText() : null;
-
-                // 获取明星照片URL
-                String celebrityPhotoUrl = selectCelebrityPhoto(userGender, gender);
+                // 使用Face++检测的性别进行匹配
+                String celebrityPhotoUrl = selectCelebrityPhoto(gender);
                 model.addAttribute("ppei", celebrityPhotoUrl);
             }
             if (jsonObject.has("age")) {
@@ -121,11 +118,8 @@ public class ResultController {
             // 根据性别选择匹配图片
             String gender = (String) resultData.get("gender");
             if (gender != null) {
-                // 优先使用用户选择的性别
-                String userGender = (String) resultData.get("userGender");
-
-                // 获取明星照片URL
-                String celebrityPhotoUrl = selectCelebrityPhoto(userGender, gender);
+                // 使用Face++检测的性别
+                String celebrityPhotoUrl = selectCelebrityPhoto(gender);
                 response.put("ppei", celebrityPhotoUrl);
             }
 
@@ -147,26 +141,21 @@ public class ResultController {
     }
 
     /**
-     * 根据用户性别选择匹配的明星照片
-     * 修复逻辑：男性匹配男性明星，女性匹配女性明星
+     * 根据Face++检测的性别选择匹配的明星照片
+     * 男性匹配男性明星，女性匹配女性明星
      * 使用本地图片，避免外部CDN失效或防盗链问题
      * 
-     * @param userGender 用户选择的性别（male/female）
-     * @param detectedGender Face++检测的性别（男性/女性）
+     * @param detectedGender Face++检测的性别（可能为“男性/女性”或“male/female”）
      * @return 明星照片URL（本地路径）
      */
-    private String selectCelebrityPhoto(String userGender, String detectedGender) {
+    private String selectCelebrityPhoto(String detectedGender) {
         String matchGender;
         
-        // 确定匹配的性别（同性匹配）
-        if ("male".equals(userGender)) {
-            matchGender = "male";
-        } else if ("female".equals(userGender)) {
+        if ("女性".equalsIgnoreCase(detectedGender) || "female".equalsIgnoreCase(detectedGender)) {
             matchGender = "female";
-        } else if ("男性".equals(detectedGender)) {
-            matchGender = "male";
         } else {
-            matchGender = "female";
+            // 默认匹配男性，避免出现空值
+            matchGender = "male";
         }
 
         // 获取明星照片URL（现在配置为本地图片，更可靠）

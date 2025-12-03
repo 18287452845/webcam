@@ -14,7 +14,7 @@
     <div class="container">
         <div class="result-content">
             <div class="back-btn">
-                <a href="${pageContext.request.contextPath}/capture.html" title="返回"></a>
+                <a href="${pageContext.request.contextPath}/index.html" title="返回首页"></a>
             </div>
             
             <video class="result-video" src="2.wav" id="video" autoplay loop muted>您所用的浏览器不支持视频标签</video>

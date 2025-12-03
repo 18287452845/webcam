@@ -25,8 +25,7 @@
     countdownTimer: null,
     countdown: 30,
     isProcessing: false,
-    mode: 'manual', // 'auto' 或 'manual'
-    selectedGender: null // 用户选择的性别
+    mode: 'manual' // 'auto' 或 'manual'
   };
 
   // ========== 配置 ==========
@@ -84,34 +83,6 @@
    */
   function updateCountdown(text) {
     elements.countdownDisplay.textContent = text;
-  }
-
-  /**
-   * 获取URL参数
-   * @param {string} name - 参数名
-   * @returns {string|null} 参数值
-   */
-  function getUrlParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-  }
-
-  /**
-   * 初始化性别选择
-   */
-  function initializeGenderSelection() {
-    const gender = getUrlParameter('gender');
-    if (gender === 'male' || gender === 'female') {
-      state.selectedGender = gender;
-      const genderText = gender === 'male' ? '👨 男性' : '👩 女性';
-      const indicator = document.getElementById('gender-indicator');
-      const textElement = document.getElementById('gender-text');
-
-      if (indicator && textElement) {
-        textElement.textContent = `当前选择：${genderText}`;
-        indicator.style.display = 'block';
-      }
-    }
   }
 
   /**
@@ -353,11 +324,6 @@
       const formData = new URLSearchParams();
       formData.append('image', imageData);
 
-      // 如果用户选择了性别，发送给后端
-      if (state.selectedGender) {
-        formData.append('gender', state.selectedGender);
-      }
-
       const response = await fetch('/webcam', {
         method: 'POST',
         headers: {
@@ -479,9 +445,6 @@
 
     // 添加页面加载动画
     document.body.classList.add('animate-fade-in');
-
-    // 初始化性别选择
-    initializeGenderSelection();
 
     // 启动摄像头
     startCamera();

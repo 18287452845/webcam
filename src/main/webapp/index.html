@@ -12,54 +12,58 @@
 	<link rel="stylesheet" href="css/variables.css">
 	<link rel="stylesheet" href="css/animations.css">
 	<link rel="stylesheet" href="css/main.css">
-	<link rel="stylesheet" href="css/home.css">
 
 	<!-- Preload critical resources -->
-	<link rel="preload" href="images/home_1920bg123.png" as="image">
+	<link rel="preload" href="images/sec.png" as="image">
 </head>
 
-<body class="home-page">
+<body>
 	<div class="container">
-		<main class="home-content" role="main">
-			<!-- Background Image with Overlay -->
-			<div class="home-bg" aria-hidden="true">
-				<img src="images/home_1920bg123.png" alt="Background">
-				<div class="bg-gradient-layer"></div>
-				<div class="bg-overlay-gradient"></div>
+		<main class="content" role="main">
+			<!-- System Title -->
+			<div class="system-title">
+				<h1 class="main-title animate-fade-in-down">NXNS 云匹配认别系统</h1>
+				<p class="subtitle animate-fade-in-up">智能人脸识别 · 精准匹配 · 快速响应</p>
 			</div>
 
-			<!-- Main Content Area -->
-			<div class="hero-section">
-				<h1 class="main-title animate-fade-in-down" data-text="NXNS 云匹配认别系统">NXNS 云匹配认别系统</h1>
-				<p class="subtitle animate-fade-in-up">智能人脸识别 · 精准匹配 · 快速响应</p>
-
-				<div class="selection-container animate-fade-in-up">
-					<a href="capture.html?gender=male" class="gender-card boy" role="button" tabindex="0" aria-label="我是男生" data-gender="male">
-						<div class="card-halo"></div>
-						<div class="card-content">
-							<div class="icon-wrapper">👨</div>
-							<h2>我是男生</h2>
-							<p>点击开始识别</p>
-						</div>
-						<div class="card-glow"></div>
-					</a>
-
-					<a href="capture.html?gender=female" class="gender-card girl" role="button" tabindex="0" aria-label="我是女生" data-gender="female">
-						<div class="card-halo"></div>
-						<div class="card-content">
-							<div class="icon-wrapper">👩</div>
-							<h2>我是女生</h2>
-							<p>点击开始识别</p>
-						</div>
-						<div class="card-glow"></div>
-					</a>
+			<!-- Video Preview Area -->
+			<div class="video-container" role="region" aria-label="摄像头预览">
+				<video id="video" autoplay playsinline aria-label="摄像头视频流"></video>
+				<canvas id="canvas" style="display:none;" aria-hidden="true"></canvas>
+				<div class="scan-overlay" aria-hidden="true">
+					<img src="saomiao.gif" alt="">
 				</div>
+			</div>
+
+			<!-- Background Image -->
+			<div class="background-image" aria-hidden="true">
+				<img src="images/sec.png" alt="">
+			</div>
+
+			<!-- Countdown Display -->
+			<div class="countdown-display" role="status" aria-live="polite" aria-atomic="true">
+				<h1 id="countdown">准备中...</h1>
+			</div>
+
+			<!-- Control Buttons -->
+			<div class="control-buttons">
+				<button id="captureBtn" class="btn btn-primary" aria-label="手动拍照">
+					<span>📸</span> 立即拍照
+				</button>
+				<button id="uploadBtn" class="btn btn-secondary" aria-label="上传图片">
+					<span>📁</span> 上传图片
+				</button>
+				<input type="file" id="fileInput" accept="image/*" style="display:none;" aria-label="选择图片文件">
+			</div>
+
+			<!-- Error Message -->
+			<div id="error-message" class="error-message" role="alert" aria-live="assertive" style="display:none;">
 			</div>
 		</main>
 	</div>
 
 	<!-- JavaScript -->
-	<script src="js/index.js"></script>
+	<script src="js/capture.js"></script>
 </body>
 
 </html>
