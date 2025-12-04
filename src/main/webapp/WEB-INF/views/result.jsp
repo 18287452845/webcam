@@ -32,8 +32,7 @@
                 <p>眼镜：<span class="p2 hidden-text">${eyestatus}</span><span class="p22"></span></p>
                 <p>笑容：<span class="p3 hidden-text">${smile}</span><span class="p33"></span></p>
                 <p>年龄：<span class="p4 hidden-text">${age}</span><span class="p44"></span></p>
-                <p>描述：<span class="p5 hidden-text">${pdesc}</span><span class="p55"></span></p>
-                <p class="praise-section">AI夸奖：<span class="p6 hidden-text">${praise}</span><span class="p66"></span></p>
+                <p class="praise-section">AI描述：<span class="p6 hidden-text">${praise}</span><span class="p66"></span></p>
             </div>
             
             <div class="result-bg">

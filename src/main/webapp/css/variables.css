@@ -1,175 +1,99 @@
 /* ========================================
-   CSS 变量系统 - Webcam 应用
+   CSS 变量系统 - Webcam 应用 (High-Tech Edition)
    ======================================== */
 
 :root {
-  /* ========== 颜色系统 ========== */
-  
-  /* 主色调 */
-  --primary-color: #02B2EA;
-  --primary-dark: #0298B7;
-  --primary-light: #02BAEA;
-  --primary-glow: rgba(2, 178, 234, 0.3);
-  
-  /* 背景颜色 */
-  --bg-color: #000000;
-  --bg-overlay: #000205;
-  --bg-overlay-light: rgba(0, 2, 5, 0.8);
-  
+  /* ========== 颜色系统 (Tech Palette) ========== */
+
+  /* 主色调 - Neon Cyan */
+  --primary-color: #00f3ff;
+  --primary-dark: #00a8b3;
+  --primary-light: #80f9ff;
+  --primary-glow: rgba(0, 243, 255, 0.5);
+
+  /* 辅助色 - Holographic Blue */
+  --secondary-color: #0066ff;
+  --secondary-glow: rgba(0, 102, 255, 0.4);
+
+  /* 背景颜色 - Deep Space */
+  --bg-color: #030508;
+  --bg-overlay: rgba(3, 5, 8, 0.85);
+  --bg-panel: rgba(10, 20, 30, 0.6);
+
   /* 文本颜色 */
-  --text-color: #ffffff;
-  --text-secondary: #cccccc;
-  --text-muted: #999999;
-  
-  /* 状态颜色 */
-  --success-color: #00ff00;
-  --error-color: #ff0000;
-  --error-bg: rgba(255, 0, 0, 0.8);
+  --text-color: #e0f7ff;
+  --text-secondary: #8ab4cc;
+  --text-muted: #4a6b7c;
+
+  /* 状态颜色 - HUD Style */
+  --success-color: #00ff9d;
+  --success-glow: rgba(0, 255, 157, 0.4);
+  --error-color: #ff2a2a;
+  --error-bg: rgba(50, 0, 0, 0.8);
+  --error-glow: rgba(255, 42, 42, 0.4);
   --warning-color: #ffaa00;
-  --info-color: var(--primary-color);
-  
+
   /* ========== 渐变系统 ========== */
-  
-  /* 主渐变 */
-  --gradient-primary: linear-gradient(135deg, #02B2EA 0%, #0298B7 50%, #02BAEA 100%);
-  --gradient-primary-hover: linear-gradient(135deg, #02BAEA 0%, #02B2EA 50%, #0298B7 100%);
-  --gradient-primary-vertical: linear-gradient(180deg, #02B2EA 0%, #0298B7 100%);
-  
-  /* 背景渐变 */
-  --gradient-bg-1: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
-  --gradient-bg-2: linear-gradient(180deg, rgba(2, 178, 234, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
-  --gradient-bg-3: radial-gradient(circle at 50% 0%, rgba(2, 178, 234, 0.15) 0%, transparent 70%);
-  --gradient-bg-overlay: linear-gradient(135deg, rgba(2, 178, 234, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
-  
-  /* 卡片渐变 */
-  --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(2, 178, 234, 0.1) 100%);
-  --gradient-card-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(2, 178, 234, 0.2) 100%);
-  --gradient-card-border: linear-gradient(135deg, rgba(2, 178, 234, 0.5) 0%, rgba(2, 186, 234, 0.3) 100%);
-  
-  /* 文字渐变 */
-  --gradient-text-primary: linear-gradient(135deg, #ffffff 0%, #02B2EA 100%);
-  --gradient-text-glow: linear-gradient(135deg, #02BAEA 0%, #02B2EA 50%, #ffffff 100%);
-  
+
+  /* Cyberpunk Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+
+  /* HUD Gradients */
+  --gradient-hud: linear-gradient(180deg, rgba(0, 243, 255, 0) 0%, rgba(0, 243, 255, 0.1) 50%, rgba(0, 243, 255, 0) 100%);
+  --gradient-scanline: linear-gradient(0deg, transparent 50%, rgba(0, 243, 255, 0.02) 50%);
+
   /* ========== 发光效果系统 ========== */
-  
-  /* 基础发光 */
-  --glow-primary: 0 0 10px rgba(2, 178, 234, 0.5);
-  --glow-primary-strong: 0 0 20px rgba(2, 178, 234, 0.8), 0 0 40px rgba(2, 178, 234, 0.4);
-  --glow-primary-intense: 0 0 30px rgba(2, 178, 234, 1), 0 0 60px rgba(2, 178, 234, 0.6), 0 0 90px rgba(2, 178, 234, 0.3);
-  
-  /* 边框发光 */
-  --glow-border: 0 0 0 1px rgba(2, 178, 234, 0.5), 0 0 10px rgba(2, 178, 234, 0.3);
-  --glow-border-strong: 0 0 0 2px rgba(2, 178, 234, 0.8), 0 0 20px rgba(2, 178, 234, 0.5);
-  
-  /* 文字发光 */
-  --glow-text: 0 0 10px rgba(2, 178, 234, 0.8), 0 0 20px rgba(2, 178, 234, 0.4);
-  --glow-text-strong: 0 0 15px rgba(2, 178, 234, 1), 0 0 30px rgba(2, 178, 234, 0.6);
-  
-  /* ========== 玻璃态效果系统 ========== */
-  
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-light: rgba(255, 255, 255, 0.1);
-  --glass-bg-hover: rgba(255, 255, 255, 0.15);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-border-strong: rgba(2, 178, 234, 0.3);
-  --glass-blur: blur(10px);
-  --glass-blur-strong: blur(20px);
-  
-  /* ========== 尺寸系统 ========== */
-  
-  /* 基础尺寸 */
-  --base-width: 1920px;
-  --base-height: 1080px;
-  
-  /* 视频尺寸 */
-  --video-width: 1200px;
-  --video-height: 900px;
-  --video-offset-x: 30px;
-  --video-offset-y: 50px;
-  
-  /* 间距系统 */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 48px;
-  
-  /* 圆角 */
+
+  /* Neon Glows */
+  --glow-xs: 0 0 5px var(--primary-glow);
+  --glow-sm: 0 0 10px var(--primary-glow);
+  --glow-md: 0 0 20px var(--primary-glow);
+  --glow-lg: 0 0 30px var(--primary-glow), 0 0 60px var(--primary-glow);
+  --glow-text: 0 0 8px var(--primary-glow);
+
+  /* Error Glow */
+  --glow-error: 0 0 20px var(--error-glow);
+
+  /* ========== 尺寸系统 (Responsive) ========== */
+
+  /* 基础尺寸 - 使用 vmin 实现自适应 */
+  --video-width: 70vmin;
+  --video-height: 52.5vmin;
+  /* 4:3 Aspect Ratio */
+
+  /* 间距 */
+  --spacing-xs: 0.5vmin;
+  --spacing-sm: 1vmin;
+  --spacing-md: 2vmin;
+  --spacing-lg: 3vmin;
+  --spacing-xl: 4vmin;
+
+  /* 圆角 - Tech Style (Often sharper or specific curves) */
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 50%;
-  
+  --radius-lg: 16px;
+
   /* ========== 字体系统 ========== */
-  
-  /* 字体家族 */
-  --font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  --font-mono: "Consolas", "Monaco", monospace;
-  
-  /* 字体大小 */
-  --font-xs: 12px;
-  --font-sm: 14px;
-  --font-base: 16px;
-  --font-lg: 18px;
-  --font-xl: 22px;
-  --font-2xl: 25px;
-  --font-3xl: 32px;
-  --font-4xl: 48px;
-  --font-5xl: 70px;
-  
-  /* 字重 */
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  
-  /* ========== 动画时长 ========== */
-  
-  --transition-fast: 0.15s;
-  --transition-base: 0.3s;
-  --transition-slow: 0.5s;
-  --transition-slower: 0.8s;
-  
-  /* ========== 阴影系统 ========== */
-  
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.25);
-  --shadow-glow: 0 0 20px var(--primary-glow);
-  
-  /* 发光阴影 */
-  --shadow-glow-sm: 0 0 10px rgba(2, 178, 234, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
-  --shadow-glow-md: 0 0 20px rgba(2, 178, 234, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3);
-  --shadow-glow-lg: 0 0 30px rgba(2, 178, 234, 0.5), 0 12px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow-xl: 0 0 40px rgba(2, 178, 234, 0.6), 0 16px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow-intense: 0 0 50px rgba(2, 178, 234, 0.8), 0 0 100px rgba(2, 178, 234, 0.4), 0 20px 40px rgba(0, 0, 0, 0.6);
-  
+
+  --font-family: "Rajdhani", "Segoe UI", "Microsoft YaHei", sans-serif;
+  /* Rajdhani is a good tech font if available, fallback to system */
+
+  /* Fluid Typography */
+  --font-xs: clamp(10px, 1.2vmin, 14px);
+  --font-sm: clamp(12px, 1.5vmin, 16px);
+  --font-base: clamp(14px, 2vmin, 18px);
+  --font-lg: clamp(16px, 2.5vmin, 24px);
+  --font-xl: clamp(20px, 3vmin, 32px);
+  --font-2xl: clamp(24px, 4vmin, 48px);
+  --font-3xl: clamp(32px, 6vmin, 64px);
+
   /* ========== 层级系统 ========== */
-  
+
   --z-background: 1;
-  --z-content: 2;
-  --z-overlay: 10;
-  --z-button: 100;
-  --z-header: 200;
-  --z-modal: 500;
-  --z-notification: 999;
-  --z-tooltip: 1000;
+  --z-video: 10;
+  --z-hud: 20;
+  --z-overlay: 30;
+  --z-controls: 40;
+  --z-modal: 100;
 }
-
-/* ========== 暗色主题变量（预留） ========== */
-[data-theme="dark"] {
-  /* 可以在此定义暗色主题的变量覆盖 */
-}
-
-/* ========== 响应式断点变量 ========== */
-/* 在 JavaScript 中使用或通过 @media 查询 */
-/* 
-  Mobile: max-width: 768px
-  Tablet: 769px - 1024px
-  Desktop Small: 1025px - 1440px
-  Desktop Medium: 1441px - 1920px
-  Desktop Large: 1921px+
-*/
