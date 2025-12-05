@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="NXNS云匹配认别系统 - 智能人脸识别平台">
+	<meta name="keywords" content="人脸识别,Face++,云识别">
+	<title>NXNS云匹配认别系统</title>
+
+	<!-- Stylesheets -->
+	<link rel="stylesheet" href="css/variables.css">
+	<link rel="stylesheet" href="css/animations.css">
+	<link rel="stylesheet" href="css/main.css">
+
+	<!-- Preload critical resources -->
+	<link rel="preload" href="images/sec.png" as="image">
+</head>
+
+<body>
+	<div class="container">
+		<main class="content" role="main">
+			<!-- System Title -->
+			<div class="system-title">
+				<h1 class="main-title animate-fade-in-down">NXNS 云匹配认别系统</h1>
+				<p class="subtitle animate-fade-in-up">智能人脸识别 · 精准匹配 · 快速响应</p>
+			</div>
+
+			<!-- Video Preview Area -->
+			<div class="video-container" role="region" aria-label="摄像头预览">
+				<video id="video" autoplay playsinline aria-label="摄像头视频流"></video>
+				<canvas id="canvas" style="display:none;" aria-hidden="true"></canvas>
+				<div class="scan-overlay" aria-hidden="true">
+					<img src="saomiao.gif" alt="">
+				</div>
+			</div>
+
+			<!-- Background Image -->
+			<div class="background-image" aria-hidden="true">
+				<img src="images/sec.png" alt="">
+			</div>
+
+			<!-- Countdown Display -->
+			<div class="countdown-display" role="status" aria-live="polite" aria-atomic="true">
+				<h1 id="countdown">准备中...</h1>
+			</div>
+
+			<!-- Control Buttons -->
+			<div class="control-buttons">
+				<button id="captureBtn" class="btn btn-primary" aria-label="手动拍照">
+					<span>📸</span> 立即拍照
+				</button>
+				<button id="uploadBtn" class="btn btn-secondary" aria-label="上传图片">
+					<span>📁</span> 上传图片
+				</button>
+				<input type="file" id="fileInput" accept="image/*" style="display:none;" aria-label="选择图片文件">
+			</div>
+
+			<!-- Error Message -->
+			<div id="error-message" class="error-message" role="alert" aria-live="assertive" style="display:none;">
+			</div>
+		</main>
+	</div>
+
+	<!-- JavaScript -->
+	<script src="js/capture.js"></script>
+</body>
+
+</html>
