@@ -421,7 +421,7 @@
    */
   function redirectToHome() {
     stopCamera();
-    window.location.href = 'index.html';
+    window.location.href = 'main.html';
   }
 
   // ========== 事件处理 ==========

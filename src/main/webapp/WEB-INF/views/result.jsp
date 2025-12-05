@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="60;url=${pageContext.request.contextPath}/index.html">
+    <meta http-equiv="refresh" content="60;url=${pageContext.request.contextPath}/main.html">
     <title>NXNS云匹配认别系统 - 匹配结果</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/variables.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/animations.css">
@@ -14,7 +14,7 @@
     <div class="container">
         <div class="result-content">
             <div class="back-btn">
-                <a href="${pageContext.request.contextPath}/index.html" title="返回首页"></a>
+                <a href="${pageContext.request.contextPath}/main.html" title="返回首页"></a>
             </div>
             
             <video class="result-video" src="2.wav" id="video" autoplay loop muted>您所用的浏览器不支持视频标签</video>

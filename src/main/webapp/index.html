@@ -6,64 +6,63 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="NXNS云匹配认别系统 - 智能人脸识别平台">
 	<meta name="keywords" content="人脸识别,Face++,云识别">
-	<title>NXNS云匹配认别系统</title>
+	<title>NXNS云匹配认别系统 - 欢迎</title>
 
 	<!-- Stylesheets -->
-	<link rel="stylesheet" href="css/variables.css">
-	<link rel="stylesheet" href="css/animations.css">
-	<link rel="stylesheet" href="css/main.css">
-
-	<!-- Preload critical resources -->
-	<link rel="preload" href="images/sec.png" as="image">
+	<link rel="stylesheet" href="css/splash.css">
 </head>
 
 <body>
-	<div class="container">
-		<main class="content" role="main">
+	<div class="splash-container">
+		<!-- Background Video -->
+		<div class="video-background">
+			<video id="splash-video" autoplay muted loop playsinline>
+				<source src="images/start.mp4" type="video/mp4">
+				您的浏览器不支持视频播放。
+			</video>
+		</div>
+
+		<!-- Overlay Content -->
+		<div class="splash-content">
 			<!-- System Title -->
-			<div class="system-title">
-				<h1 class="main-title animate-fade-in-down">NXNS 云匹配认别系统</h1>
-				<p class="subtitle animate-fade-in-up">智能人脸识别 · 精准匹配 · 快速响应</p>
+			<div class="splash-title">
+				<h1 class="animate-fade-in">NXNS 云匹配认别系统</h1>
+				<p class="subtitle animate-fade-in-delay">智能人脸识别 · 精准匹配 · 快速响应</p>
 			</div>
 
-			<!-- Video Preview Area -->
-			<div class="video-container" role="region" aria-label="摄像头预览">
-				<video id="video" autoplay playsinline aria-label="摄像头视频流"></video>
-				<canvas id="canvas" style="display:none;" aria-hidden="true"></canvas>
-				<div class="scan-overlay" aria-hidden="true">
-					<img src="saomiao.gif" alt="">
-				</div>
-			</div>
-
-			<!-- Background Image -->
-			<div class="background-image" aria-hidden="true">
-				<img src="images/sec.png" alt="">
-			</div>
-
-			<!-- Countdown Display -->
-			<div class="countdown-display" role="status" aria-live="polite" aria-atomic="true">
-				<h1 id="countdown">准备中...</h1>
-			</div>
-
-			<!-- Control Buttons -->
-			<div class="control-buttons">
-				<button id="captureBtn" class="btn btn-primary" aria-label="手动拍照">
-					<span>📸</span> 立即拍照
-				</button>
-				<button id="uploadBtn" class="btn btn-secondary" aria-label="上传图片">
-					<span>📁</span> 上传图片
-				</button>
-				<input type="file" id="fileInput" accept="image/*" style="display:none;" aria-label="选择图片文件">
-			</div>
-
-			<!-- Error Message -->
-			<div id="error-message" class="error-message" role="alert" aria-live="assertive" style="display:none;">
-			</div>
-		</main>
+			<!-- Start Button -->
+			<button id="start-btn" class="start-button animate-scale-in" onclick="enterSystem()">
+				<span class="button-icon">🚀</span>
+				<span class="button-text">开始体验</span>
+			</button>
+		</div>
 	</div>
 
-	<!-- JavaScript -->
-	<script src="js/capture.js"></script>
+	<script>
+		// Enter system function
+		function enterSystem() {
+			// Add fade out animation
+			document.querySelector('.splash-container').classList.add('fade-out');
+			
+			// Navigate to main page after animation
+			setTimeout(function() {
+				window.location.href = 'main.html';
+			}, 600);
+		}
+
+		// Optional: Allow Enter key to start
+		document.addEventListener('keydown', function(event) {
+			if (event.key === 'Enter') {
+				enterSystem();
+			}
+		});
+
+		// Add loaded class after video starts playing
+		const video = document.getElementById('splash-video');
+		video.addEventListener('loadeddata', function() {
+			document.body.classList.add('loaded');
+		});
+	</script>
 </body>
 
 </html>
