@@ -13,20 +13,20 @@ import java.util.Map;
 public interface FaceRecognitionService {
 
     /**
-     * 调用Face++ API进行人脸检测和属性分析
+     * 调用阿里云百炼API进行人脸检测和健康分析
      * 
      * @param imagePath 图像文件路径
-     * @return 包含人脸属性的Map (gender, age, smile, eyestatus等)
-     * @throws webcam.exception.FacePlusPlusApiException 当API调用失败时
+     * @return 包含人脸属性和健康分析的Map (gender, age, smile, eyestatus, healthAnalysis等)
+     * @throws webcam.exception.BailianApiException 当API调用失败时
      */
     Map<String, Object> detectFaceAttributes(Path imagePath);
 
     /**
-     * 解析Face++ API的响应
+     * 解析阿里云百炼API的响应
      * 
      * @param apiResponse API响应的JSON字符串
-     * @return 解析后的人脸属性Map
-     * @throws webcam.exception.FacePlusPlusApiException 当响应解析失败时
+     * @return 解析后的人脸属性和健康分析Map
+     * @throws webcam.exception.BailianApiException 当响应解析失败时
      */
     Map<String, Object> parseApiResponse(String apiResponse);
 }

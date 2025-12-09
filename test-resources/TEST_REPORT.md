@@ -8,7 +8,7 @@
 - 后端服务：Spring Boot 3.2.0 (http://localhost:8080)
 - Java版本：17
 - 浏览器：Chrome/Firefox/Edge
-- Face++ API：真实环境测试
+- 阿里云百炼API：真实环境测试
 
 **测试范围：**
 - API接口测试
@@ -190,7 +190,7 @@ if (base64Data.length() < 100) {
 ### 后端配置
 - **服务地址：** http://localhost:8080
 - **上传目录：** upload/
-- **Face++ API：** https://api-cn.faceplusplus.com/facepp/v3/detect
+- **阿里云百炼API：** https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
 - **API密钥：** 已配置（真实环境）
 
 ### 前端配置

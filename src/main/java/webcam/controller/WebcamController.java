@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import webcam.service.DeepSeekPraiseService;
 import webcam.service.FaceRecognitionService;
 import webcam.service.ImageStorageService;
 
@@ -17,7 +16,7 @@ import java.util.UUID;
 
 /**
  * Webcam控制器
- * 处理摄像头图像上传和Face++ API调用
+ * 处理摄像头图像上传和阿里云百炼API调用
  * 采用分层架构，Controller只负责HTTP请求/响应，业务逻辑由Service层处理
  * 
  * @author Webcam Application
@@ -31,26 +30,22 @@ public class WebcamController {
 
     private final ImageStorageService imageStorageService;
     private final FaceRecognitionService faceRecognitionService;
-    private final DeepSeekPraiseService deepSeekPraiseService;
 
     /**
      * 构造函数，注入依赖的Service
      * 
      * @param imageStorageService    图像存储服务
      * @param faceRecognitionService 人脸识别服务
-     * @param deepSeekPraiseService  DeepSeek夸奖服务
      */
     @Autowired
     public WebcamController(ImageStorageService imageStorageService,
-            FaceRecognitionService faceRecognitionService,
-            DeepSeekPraiseService deepSeekPraiseService) {
+            FaceRecognitionService faceRecognitionService) {
         this.imageStorageService = imageStorageService;
         this.faceRecognitionService = faceRecognitionService;
-        this.deepSeekPraiseService = deepSeekPraiseService;
     }
 
     /**
-     * 处理图像上传和Face++ API调用
+     * 处理图像上传和阿里云百炼API调用
      *
      * @param imageData Base64编码的图像数据（可能包含data:image/png;base64,前缀）
      * @return 包含检测结果的JSON响应
@@ -76,7 +71,7 @@ public class WebcamController {
             Path filePath = imageStorageService.saveBase64Image(base64Data, fileName);
             logger.debug("Image saved: {} [RequestId: {}]", fileName, requestId);
 
-            // 调用Face++ API进行人脸检测（Service层会抛出异常，由GlobalExceptionHandler处理）
+            // 调用阿里云百炼API进行人脸检测和健康分析（Service层会抛出异常，由GlobalExceptionHandler处理）
             Map<String, Object> faceAttributes = faceRecognitionService.detectFaceAttributes(filePath);
             if (faceAttributes == null) {
                 faceAttributes = new HashMap<>();
@@ -88,19 +83,7 @@ public class WebcamController {
             String imageUrl = imageStorageService.getImageUrl(fileName);
             faceAttributes.put("img", imageUrl);
 
-            // 调用DeepSeek AI生成夸奖内容
-            if (!faceAttributes.isEmpty()) {
-                try {
-                    Map<String, Object> praiseAttributes = new HashMap<>(faceAttributes);
-                    String praise = deepSeekPraiseService.generatePraise(praiseAttributes);
-                    faceAttributes.put("praise", praise);
-                    logger.debug("Generated praise: {} [RequestId: {}]", praise, requestId);
-                } catch (Exception e) {
-                    logger.error("Failed to generate praise [RequestId: {}]", requestId, e);
-                    // 如果生成失败，不影响主流程，使用默认夸奖
-                    faceAttributes.put("praise", "你真棒！");
-                }
-            }
+            // 百炼API已返回praise和healthAnalysis，无需额外处理
 
             // 构建成功响应
             ApiResponse<Map<String, Object>> response = ApiResponse.success(faceAttributes, startTime);

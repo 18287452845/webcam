@@ -403,14 +403,16 @@ body {
 .main-content {
     position: relative;
     width: 100vmin;
-    min-height: 40vmin;
+    min-height: 50vmin;
+    max-height: 85vh;
+    overflow-y: auto;
     background: rgba(0, 15, 30, 0.85);
     border: 1px solid var(--primary-color);
     padding: var(--spacing-lg);
     z-index: var(--z-hud);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: var(--spacing-lg);
 
     /* Tech HUD Shape */
     clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px),
@@ -418,6 +420,24 @@ body {
 
     box-shadow: var(--glow-md), inset 0 0 30px rgba(0, 243, 255, 0.1);
     backdrop-filter: blur(10px);
+}
+
+/* 滚动条样式 */
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: rgba(0, 15, 30, 0.5);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light);
 }
 
 /* Decorative corners for main content */
@@ -435,6 +455,44 @@ body {
     opacity: 0.5;
 }
 
+/* 区域标题 */
+.section-title {
+    font-size: var(--font-xl);
+    color: var(--primary-color);
+    text-shadow: var(--glow-text);
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.health-title {
+    color: var(--success-color);
+    border-bottom-color: var(--success-color);
+}
+
+.health-icon {
+    font-size: 1.2em;
+    animation: pulse 2s infinite;
+}
+
+/* 信息区域 */
+.info-section,
+.praise-section,
+.health-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
 .main-content p {
     font-size: var(--font-lg);
     margin: var(--spacing-sm) 0;
@@ -448,6 +506,45 @@ body {
     margin-left: var(--spacing-sm);
     color: var(--primary-light);
     font-weight: bold;
+}
+
+/* 夸奖文本样式 */
+.praise-text {
+    font-size: var(--font-base);
+    line-height: 1.8;
+    color: var(--text-color);
+    padding: var(--spacing-md);
+    background: rgba(0, 243, 255, 0.05);
+    border-left: 3px solid var(--primary-color);
+    margin: 0;
+}
+
+.praise-text span {
+    color: var(--primary-light);
+    font-weight: normal;
+}
+
+/* 健康分析区域 */
+.health-content {
+    padding: var(--spacing-md);
+    background: rgba(0, 255, 157, 0.05);
+    border: 1px solid var(--success-color);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+}
+
+.health-text {
+    font-size: var(--font-base);
+    line-height: 1.8;
+    color: var(--text-color);
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.health-text span {
+    color: var(--success-color);
+    font-weight: normal;
 }
 
 .hidden-text {
@@ -510,6 +607,52 @@ body {
     color: #000;
 }
 
+/* Back Button for Main Page */
+.back-btn {
+    position: absolute;
+    top: 4vmin;
+    left: 4vmin;
+    z-index: var(--z-controls);
+}
+
+.back-btn a {
+    display: block;
+    width: 8vmin;
+    height: 5vmin;
+    min-width: 80px;
+    min-height: 40px;
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.3s ease;
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    box-shadow: var(--glow-sm);
+}
+
+.back-btn a::before {
+    content: '← 首页';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: var(--font-sm);
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.back-btn a:hover {
+    background: var(--primary-color);
+    box-shadow: var(--glow-lg);
+    transform: translateY(-2px);
+}
+
+.back-btn a:hover::before {
+    color: #000;
+}
+
 /* Responsive adjustments for Result Page */
 @media (max-width: 768px) {
     .user-image {
@@ -532,11 +675,45 @@ body {
     .main-content {
         width: 90vmin;
         margin-top: 30vmin;
+        max-height: 70vh;
+        padding: var(--spacing-md);
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .section-title {
+        font-size: var(--font-lg);
+    }
+    
+    .praise-text,
+    .health-text {
+        font-size: var(--font-sm);
+        padding: var(--spacing-sm);
     }
 
     .result-video {
         width: 100%;
         height: 100%;
         opacity: 0.2;
+    }
+    
+    /* Back button responsive */
+    .back-btn {
+        top: 2vmin;
+        left: 2vmin;
+    }
+    
+    .back-btn a {
+        width: 60px;
+        height: 35px;
+        min-width: 60px;
+        min-height: 35px;
+    }
+    
+    .back-btn a::before {
+        font-size: 12px;
     }
 }

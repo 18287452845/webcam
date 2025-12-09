@@ -74,7 +74,7 @@ public class ResultController {
                 String gender = jsonObject.get("gender").asText();
                 model.addAttribute("gender", gender);
 
-                // 使用Face++检测的性别进行匹配
+                // 使用百炼API检测的性别进行匹配
                 String celebrityPhotoUrl = selectCelebrityPhoto(gender);
                 model.addAttribute("ppei", celebrityPhotoUrl);
             }
@@ -85,6 +85,9 @@ public class ResultController {
                 model.addAttribute("praise", jsonObject.get("praise").asText());
             } else {
                 model.addAttribute("praise", "你真棒！");
+            }
+            if (jsonObject.has("healthAnalysis")) {
+                model.addAttribute("healthAnalysis", jsonObject.get("healthAnalysis").asText());
             }
 
             // 随机生成描述
@@ -118,7 +121,7 @@ public class ResultController {
             // 根据性别选择匹配图片
             String gender = (String) resultData.get("gender");
             if (gender != null) {
-                // 使用Face++检测的性别
+                // 使用百炼API检测的性别
                 String celebrityPhotoUrl = selectCelebrityPhoto(gender);
                 response.put("ppei", celebrityPhotoUrl);
             }
@@ -141,11 +144,11 @@ public class ResultController {
     }
 
     /**
-     * 根据Face++检测的性别选择匹配的明星照片
+     * 根据百炼API检测的性别选择匹配的明星照片
      * 男性匹配男性明星，女性匹配女性明星
      * 使用本地图片，避免外部CDN失效或防盗链问题
      * 
-     * @param detectedGender Face++检测的性别（可能为“男性/女性”或“male/female”）
+     * @param detectedGender 百炼API检测的性别（可能为"男性/女性"或"male/female"）
      * @return 明星照片URL（本地路径）
      */
     private String selectCelebrityPhoto(String detectedGender) {

@@ -1,14 +1,14 @@
 # Mock测试指南
 
-本文档描述如何执行Mock测试，模拟Face++ API失败场景。
+本文档描述如何执行Mock测试，模拟阿里云百炼API失败场景。
 
 ## 测试目的
 
-验证当Face++ API调用失败时，系统的错误处理机制是否正常工作。
+验证当阿里云百炼API调用失败时，系统的错误处理机制是否正常工作。
 
 ## 测试方法
 
-由于当前系统直接调用真实的Face++ API，Mock测试可以通过以下方式进行：
+由于当前系统直接调用真实的阿里云百炼API，Mock测试可以通过以下方式进行：
 
 ### 方法1: 临时修改配置使用无效API密钥
 
@@ -18,8 +18,7 @@
    - 备份 `src/main/resources/application.properties`
 
 2. **修改API密钥**
-   - 将 `faceplusplus.api.key` 改为无效值（如 `invalid_key`）
-   - 将 `faceplusplus.api.secret` 改为无效值（如 `invalid_secret`）
+   - 将 `bailian.api.api-key` 改为无效值（如 `invalid_key`）
 
 3. **重启服务**
    - 停止当前服务
@@ -53,7 +52,7 @@
 
 **测试步骤：**
 
-1. **断开网络连接**（或使用防火墙阻止对Face++ API的访问）
+1. **断开网络连接**（或使用防火墙阻止对阿里云百炼API的访问）
 
 2. **执行测试**
    - 通过API或前端上传图片
@@ -78,11 +77,11 @@
 **测试步骤：**
 
 1. **使用Postman创建Mock服务器**
-   - 创建一个Mock端点模拟Face++ API
+   - 创建一个Mock端点模拟阿里云百炼API
    - 配置返回错误响应
 
 2. **修改应用配置**
-   - 临时修改 `faceplusplus.api.url` 指向Mock服务器
+   - 临时修改 `bailian.api.endpoint` 指向Mock服务器
 
 3. **执行测试**
    - 通过API或前端上传图片
@@ -91,7 +90,7 @@
    - 验证系统正确处理API错误响应
 
 **预期结果：**
-- 系统能够处理Face++ API返回的各种错误状态
+- 系统能够处理阿里云百炼API返回的各种错误状态
 - 错误处理逻辑正确
 
 **实际结果：** [ ] PASS [ ] FAIL
@@ -100,7 +99,7 @@
 
 ## 测试用例
 
-### TC-MOCK-001: Face++ API认证失败
+### TC-MOCK-001: 阿里云百炼API认证失败
 
 **测试场景：** API密钥无效
 
@@ -119,7 +118,7 @@
 
 ---
 
-### TC-MOCK-002: Face++ API网络超时
+### TC-MOCK-002: 阿里云百炼API网络超时
 
 **测试场景：** API响应超时
 
@@ -138,19 +137,19 @@
 
 ---
 
-### TC-MOCK-003: Face++ API返回错误
+### TC-MOCK-003: 阿里云百炼API返回错误
 
 **测试场景：** API返回业务错误
 
 **预期响应：**
-- 系统应该能够解析Face++的错误响应
+- 系统应该能够解析阿里云百炼API的错误响应
 - 返回适当的错误信息
 
 **HTTP状态码：** 503
 
 ---
 
-## Mock Face++ API错误响应示例
+## Mock 阿里云百炼API错误响应示例
 
 ### 认证失败响应
 ```json
@@ -199,6 +198,6 @@
 
 查看错误处理实现：
 - `src/main/java/webcam/exception/GlobalExceptionHandler.java`
-- `src/main/java/webcam/exception/FacePlusPlusApiException.java`
+- `src/main/java/webcam/exception/BailianApiException.java`
 - `src/main/java/webcam/service/FaceRecognitionServiceImpl.java`
 

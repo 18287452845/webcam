@@ -72,15 +72,20 @@ public class MapUtil {
     /**
      * 转换性别值
      * 
-     * @param value 性别值（Male/Female）
+     * @param value 性别值（Male/Female/男性/女性）
      * @return 中文性别描述
      */
     public static String gender(String value) {
-        return switch (value) {
-            case "Male" -> "男性";
-            case "Female" -> "女性";
-            default -> "未知";
-        };
+        if (value == null) {
+            return "未知";
+        }
+        String lowerValue = value.toLowerCase();
+        if (lowerValue.contains("male") || lowerValue.contains("男")) {
+            return "男性";
+        } else if (lowerValue.contains("female") || lowerValue.contains("女")) {
+            return "女性";
+        }
+        return "未知";
     }
     
     /**

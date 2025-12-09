@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!doctype html>
 <html lang="zh-CN">
 <head>
@@ -28,11 +29,31 @@
             </div>
             
             <div class="main-content">
-                <p>性别：<span class="p1 hidden-text">${gender}</span><span class="p11"></span></p>
-                <p>眼镜：<span class="p2 hidden-text">${eyestatus}</span><span class="p22"></span></p>
-                <p>笑容：<span class="p3 hidden-text">${smile}</span><span class="p33"></span></p>
-                <p>年龄：<span class="p4 hidden-text">${age}</span><span class="p44"></span></p>
-                <p class="praise-section">AI描述：<span class="p6 hidden-text">${praise}</span><span class="p66"></span></p>
+                <div class="info-section">
+                    <h3 class="section-title">基本信息</h3>
+                    <div class="info-grid">
+                        <p>性别：<span class="p1 hidden-text">${gender}</span><span class="p11"></span></p>
+                        <p>年龄：<span class="p4 hidden-text">${age}</span><span class="p44"></span></p>
+                        <p>眼镜：<span class="p2 hidden-text">${eyestatus}</span><span class="p22"></span></p>
+                        <p>笑容：<span class="p3 hidden-text">${smile}</span><span class="p33"></span></p>
+                    </div>
+                </div>
+                
+                <div class="praise-section">
+                    <h3 class="section-title">AI评价</h3>
+                    <p class="praise-text"><span class="p6 hidden-text">${praise}</span><span class="p66"></span></p>
+                </div>
+                
+                <c:if test="${not empty healthAnalysis}">
+                <div class="health-section">
+                    <h3 class="section-title health-title">
+                        <span class="health-icon">⚕</span>健康分析
+                    </h3>
+                    <div class="health-content">
+                        <p class="health-text"><span class="p7 hidden-text">${healthAnalysis}</span><span class="p77"></span></p>
+                    </div>
+                </div>
+                </c:if>
             </div>
             
             <div class="result-bg">
@@ -126,8 +147,8 @@
                 setTimeout(() => animateText('.p2', '.p22', 150), 500);
                 setTimeout(() => animateText('.p3', '.p33', 150), 1600);
                 setTimeout(() => animateText('.p4', '.p44', 150), 2000);
-                setTimeout(() => animateText('.p5', '.p55', 100), 2500);
-                setTimeout(() => animateText('.p6', '.p66', 80), 3500);
+                setTimeout(() => animateText('.p6', '.p66', 80), 3000);
+                setTimeout(() => animateText('.p7', '.p77', 60), 4500);
                 
                 const pauseTimes = [];
                 
@@ -142,7 +163,14 @@
                 const praiseElement = document.querySelector('.p6');
                 if (praiseElement) {
                     const praiseLength = praiseElement.textContent.length;
-                    pauseTimes.push((praiseLength * 0.08 + 3.5) * 1000);
+                    pauseTimes.push((praiseLength * 0.08 + 3.0) * 1000);
+                }
+                
+                // 根据健康分析长度计算暂停时间
+                const healthElement = document.querySelector('.p7');
+                if (healthElement) {
+                    const healthLength = healthElement.textContent.length;
+                    pauseTimes.push((healthLength * 0.06 + 4.5) * 1000);
                 }
                 
                 if (pauseTimes.length > 0) {

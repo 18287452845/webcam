@@ -59,17 +59,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理Face++ API异常
+     * 处理阿里云百炼API异常
      * 
      * @param ex      异常对象
      * @param request Web请求
      * @return 错误响应
      */
-    @ExceptionHandler(FacePlusPlusApiException.class)
-    public ResponseEntity<ApiResponse<Map<String, Object>>> handleFacePlusPlusApiException(
-            FacePlusPlusApiException ex, WebRequest request) {
+    @ExceptionHandler(webcam.exception.BailianApiException.class)
+    public ResponseEntity<ApiResponse<Map<String, Object>>> handleBailianApiException(
+            webcam.exception.BailianApiException ex, WebRequest request) {
         String requestId = generateRequestId();
-        logger.error("Face++ API error [RequestId: {}]: {}", requestId, ex.getMessage(), ex);
+        logger.error("百炼API error [RequestId: {}]: {}", requestId, ex.getMessage(), ex);
 
         ApiResponse<Map<String, Object>> response = ApiResponse.error(
             "FACE_API_ERROR",
