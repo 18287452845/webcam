@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.Model;
+import webcam.service.CartoonImageService;
 import webcam.service.CelebrityPhotoService;
 
 import java.util.HashMap;
@@ -28,6 +29,9 @@ import static org.mockito.Mockito.*;
 class ResultControllerTest {
 
     @Mock
+    private CartoonImageService cartoonImageService;
+
+    @Mock
     private CelebrityPhotoService celebrityPhotoService;
 
     @Mock
@@ -40,7 +44,9 @@ class ResultControllerTest {
 
     @BeforeEach
     void setUp() {
-        resultController = new ResultController(objectMapper, celebrityPhotoService);
+        resultController = new ResultController(objectMapper, cartoonImageService, celebrityPhotoService);
+        // 默认mock：卡通图片生成失败，降级到明星照片
+        when(cartoonImageService.generateCartoonImageFromUrl(anyString())).thenReturn(null);
     }
 
     @Test

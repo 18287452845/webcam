@@ -10,7 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import webcam.MapUtil;
+import webcam.service.CartoonImageService;
 import webcam.service.CelebrityPhotoService;
+import webcam.exception.BailianApiException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,12 +32,16 @@ public class ResultController {
     private static final Logger logger = LoggerFactory.getLogger(ResultController.class);
     
     private final ObjectMapper objectMapper;
+    private final CartoonImageService cartoonImageService;
     private final CelebrityPhotoService celebrityPhotoService;
     private final Random random = new Random();
 
     @Autowired
-    public ResultController(ObjectMapper objectMapper, CelebrityPhotoService celebrityPhotoService) {
+    public ResultController(ObjectMapper objectMapper, 
+                           CartoonImageService cartoonImageService,
+                           CelebrityPhotoService celebrityPhotoService) {
         this.objectMapper = objectMapper;
+        this.cartoonImageService = cartoonImageService;
         this.celebrityPhotoService = celebrityPhotoService;
     }
 
@@ -58,8 +64,10 @@ public class ResultController {
             JsonNode jsonObject = objectMapper.readTree(msg);
             
             // 设置模型属性
+            String userImageUrl = null;
             if (jsonObject.has("img")) {
-                model.addAttribute("img", jsonObject.get("img").asText());
+                userImageUrl = jsonObject.get("img").asText();
+                model.addAttribute("img", userImageUrl);
             }
             if (jsonObject.has("faceToken")) {
                 model.addAttribute("faceToken", jsonObject.get("faceToken").asText());
@@ -74,9 +82,9 @@ public class ResultController {
                 String gender = jsonObject.get("gender").asText();
                 model.addAttribute("gender", gender);
 
-                // 使用百炼API检测的性别进行匹配
-                String celebrityPhotoUrl = selectCelebrityPhoto(gender);
-                model.addAttribute("ppei", celebrityPhotoUrl);
+                // 尝试生成卡通图片，失败则使用明星照片作为降级方案
+                String cartoonImageUrl = generateCartoonImageWithFallback(userImageUrl, gender);
+                model.addAttribute("ppei", cartoonImageUrl);
             }
             if (jsonObject.has("age")) {
                 model.addAttribute("age", jsonObject.get("age").asText());
@@ -120,10 +128,11 @@ public class ResultController {
 
             // 根据性别选择匹配图片
             String gender = (String) resultData.get("gender");
+            String userImageUrl = (String) resultData.get("img");
             if (gender != null) {
-                // 使用百炼API检测的性别
-                String celebrityPhotoUrl = selectCelebrityPhoto(gender);
-                response.put("ppei", celebrityPhotoUrl);
+                // 尝试生成卡通图片，失败则使用明星照片作为降级方案
+                String cartoonImageUrl = generateCartoonImageWithFallback(userImageUrl, gender);
+                response.put("ppei", cartoonImageUrl);
             }
 
             // 确保夸奖内容存在
@@ -144,7 +153,35 @@ public class ResultController {
     }
 
     /**
-     * 根据百炼API检测的性别选择匹配的明星照片
+     * 生成卡通图片，失败时使用明星照片作为降级方案
+     * 
+     * @param userImageUrl 用户上传的图片URL
+     * @param detectedGender 百炼API检测的性别（可能为"男性/女性"或"male/female"）
+     * @return 卡通图片URL或明星照片URL（降级方案）
+     */
+    private String generateCartoonImageWithFallback(String userImageUrl, String detectedGender) {
+        // 优先尝试生成卡通图片
+        if (userImageUrl != null && !userImageUrl.isEmpty()) {
+            try {
+                String cartoonImageUrl = cartoonImageService.generateCartoonImageFromUrl(userImageUrl);
+                if (cartoonImageUrl != null && !cartoonImageUrl.isEmpty()) {
+                    logger.info("Cartoon image generated successfully: {}", cartoonImageUrl);
+                    return cartoonImageUrl;
+                }
+            } catch (BailianApiException e) {
+                logger.warn("Failed to generate cartoon image, falling back to celebrity photo: {}", e.getMessage());
+            } catch (Exception e) {
+                logger.warn("Unexpected error generating cartoon image, falling back to celebrity photo", e);
+            }
+        }
+        
+        // 降级方案：使用明星照片
+        logger.debug("Using celebrity photo as fallback");
+        return selectCelebrityPhoto(detectedGender);
+    }
+
+    /**
+     * 根据百炼API检测的性别选择匹配的明星照片（降级方案）
      * 男性匹配男性明星，女性匹配女性明星
      * 使用本地图片，避免外部CDN失效或防盗链问题
      * 
