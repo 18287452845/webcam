@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import webcam.MapUtil;
+import webcam.dto.CartoonImageResult;
 import webcam.service.CartoonImageService;
 import webcam.service.CelebrityPhotoService;
 import webcam.exception.BailianApiException;
@@ -154,6 +155,7 @@ public class ResultController {
 
     /**
      * 生成卡通图片，失败时使用明星照片作为降级方案
+     * 返回卡通图片URL（优先）或明星照片URL（降级方案）
      * 
      * @param userImageUrl 用户上传的图片URL
      * @param detectedGender 百炼API检测的性别（可能为"男性/女性"或"male/female"）
@@ -163,10 +165,11 @@ public class ResultController {
         // 优先尝试生成卡通图片
         if (userImageUrl != null && !userImageUrl.isEmpty()) {
             try {
-                String cartoonImageUrl = cartoonImageService.generateCartoonImageFromUrl(userImageUrl);
-                if (cartoonImageUrl != null && !cartoonImageUrl.isEmpty()) {
-                    logger.info("Cartoon image generated successfully: {}", cartoonImageUrl);
-                    return cartoonImageUrl;
+                CartoonImageResult cartoonResult = cartoonImageService.generateCartoonImageFromUrl(userImageUrl);
+                if (cartoonResult != null && cartoonResult.getLocalUrl() != null && !cartoonResult.getLocalUrl().isEmpty()) {
+                    logger.info("Cartoon image generated successfully: {}", cartoonResult.getLocalUrl());
+                    // 返回本地URL用于展示，R2信息由前端另行处理
+                    return cartoonResult.getLocalUrl();
                 }
             } catch (BailianApiException e) {
                 logger.warn("Failed to generate cartoon image, falling back to celebrity photo: {}", e.getMessage());
