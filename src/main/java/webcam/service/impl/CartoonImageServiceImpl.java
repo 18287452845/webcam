@@ -9,10 +9,15 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import webcam.config.CartoonApiProperties;
+import webcam.config.R2Properties;
 import webcam.config.UploadProperties;
+import webcam.dto.CartoonImageResult;
 import webcam.exception.BailianApiException;
+import webcam.exception.FileStorageException;
 import webcam.service.CartoonImageService;
 import webcam.service.ImageStorageService;
+import webcam.service.QrCodeService;
+import webcam.service.R2UploadService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -20,6 +25,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +48,9 @@ public class CartoonImageServiceImpl implements CartoonImageService {
     private final ObjectMapper objectMapper;
     private final ImageStorageService imageStorageService;
     private final UploadProperties uploadProperties;
+    private final R2UploadService r2UploadService;
+    private final R2Properties r2Properties;
+    private final QrCodeService qrCodeService;
 
     @Autowired
     public CartoonImageServiceImpl(
@@ -49,16 +58,22 @@ public class CartoonImageServiceImpl implements CartoonImageService {
             RestTemplate restTemplate,
             ObjectMapper objectMapper,
             ImageStorageService imageStorageService,
-            UploadProperties uploadProperties) {
+            UploadProperties uploadProperties,
+            R2UploadService r2UploadService,
+            R2Properties r2Properties,
+            QrCodeService qrCodeService) {
         this.cartoonApiProperties = cartoonApiProperties;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.imageStorageService = imageStorageService;
         this.uploadProperties = uploadProperties;
+        this.r2UploadService = r2UploadService;
+        this.r2Properties = r2Properties;
+        this.qrCodeService = qrCodeService;
     }
 
     @Override
-    public String generateCartoonImage(Path userImagePath) {
+    public CartoonImageResult generateCartoonImage(Path userImagePath) {
         try {
             logger.info("Generating cartoon image from: {}", userImagePath);
             
@@ -75,10 +90,11 @@ public class CartoonImageServiceImpl implements CartoonImageService {
             }
             
             // 下载生成的卡通图片并保存到本地
-            String savedImageUrl = downloadAndSaveCartoonImage(cartoonImageUrl);
+            CartoonImageResult result = downloadAndSaveCartoonImage(cartoonImageUrl);
             
-            logger.info("Cartoon image generated successfully: {}", savedImageUrl);
-            return savedImageUrl;
+            logger.info("Cartoon image generated successfully: local={}, r2={}", 
+                    result.getLocalUrl(), result.getR2ObjectKey());
+            return result;
             
         } catch (BailianApiException e) {
             logger.error("Error calling cartoon API", e);
@@ -90,7 +106,7 @@ public class CartoonImageServiceImpl implements CartoonImageService {
     }
 
     @Override
-    public String generateCartoonImageFromUrl(String userImageUrl) {
+    public CartoonImageResult generateCartoonImageFromUrl(String userImageUrl) {
         try {
             logger.info("Generating cartoon image from URL: {}", userImageUrl);
             
@@ -112,10 +128,11 @@ public class CartoonImageServiceImpl implements CartoonImageService {
             }
             
             // 下载生成的卡通图片并保存到本地
-            String savedImageUrl = downloadAndSaveCartoonImage(cartoonImageUrl);
+            CartoonImageResult result = downloadAndSaveCartoonImage(cartoonImageUrl);
             
-            logger.info("Cartoon image generated successfully: {}", savedImageUrl);
-            return savedImageUrl;
+            logger.info("Cartoon image generated successfully: local={}, r2={}", 
+                    result.getLocalUrl(), result.getR2ObjectKey());
+            return result;
             
         } catch (Exception e) {
             logger.error("Error generating cartoon image from URL: {}", userImageUrl, e);
@@ -376,10 +393,11 @@ public class CartoonImageServiceImpl implements CartoonImageService {
     }
 
     /**
-     * 下载并保存生成的卡通图片到本地
+     * 下载并保存生成的卡通图片到本地和R2
      * 使用Java原生URLConnection避免RestTemplate对URL的重新编码导致OSS签名不匹配
+     * 下载后上传到Cloudflare R2并生成预签名URL和二维码
      */
-    private String downloadAndSaveCartoonImage(String imageUrl) {
+    private CartoonImageResult downloadAndSaveCartoonImage(String imageUrl) {
         try {
             logger.debug("Downloading cartoon image from: {}", imageUrl);
             
@@ -418,15 +436,51 @@ public class CartoonImageServiceImpl implements CartoonImageService {
             
             // 生成文件名
             String fileName = "cartoon_" + UUID.randomUUID() + ".jpeg";
+            String base64Data = Base64.getEncoder().encodeToString(imageBytes);
             
             // 保存到本地
-            String base64Data = Base64.getEncoder().encodeToString(imageBytes);
             Path savedPath = imageStorageService.saveBase64Image(base64Data, fileName);
+            String localUrl = imageStorageService.getImageUrl(fileName);
+            logger.info("Cartoon image saved locally: {}", fileName);
             
-            logger.info("Cartoon image saved successfully: {}", fileName);
+            // 上传到Cloudflare R2
+            CartoonImageResult result = new CartoonImageResult();
+            result.setLocalUrl(localUrl);
+            result.setFileSize(imageBytes.length);
             
-            // 返回访问URL
-            return imageStorageService.getImageUrl(fileName);
+            try {
+                String r2ObjectKey = generateR2ObjectKey();
+                logger.debug("Uploading cartoon image to R2: key={}", r2ObjectKey);
+                
+                R2UploadService.R2ObjectInfo r2Info = r2UploadService.uploadFromBase64(
+                        base64Data, r2ObjectKey, "image/jpeg");
+                
+                result.setR2ObjectKey(r2ObjectKey);
+                
+                // 生成预签名URL（600秒有效期）
+                String presignedUrl = r2UploadService.getPresignedUrl(r2ObjectKey, 
+                        r2Properties.getPresignedUrlExpiration());
+                result.setPresignedUrl(presignedUrl);
+                
+                logger.info("R2 presigned URL generated: expires in {} seconds", 
+                        r2Properties.getPresignedUrlExpiration());
+                
+                // 生成二维码（编码presigned URL）
+                try {
+                    String qrCodeBase64 = qrCodeService.generateQrCodeBase64(presignedUrl, 400, 400);
+                    result.setQrCodeBase64(qrCodeBase64);
+                    logger.info("QR code generated successfully");
+                } catch (Exception e) {
+                    logger.warn("Failed to generate QR code, continuing without it", e);
+                }
+                
+            } catch (FileStorageException e) {
+                logger.warn("R2 upload failed, but continuing with local storage: {}", e.getMessage());
+            } catch (Exception e) {
+                logger.warn("R2 operations failed, but continuing with local storage: {}", e.getMessage());
+            }
+            
+            return result;
             
         } catch (java.net.MalformedURLException e) {
             logger.error("Invalid image URL: {}", imageUrl, e);
@@ -440,6 +494,15 @@ public class CartoonImageServiceImpl implements CartoonImageService {
             logger.error("Error downloading and saving cartoon image", e);
             throw new BailianApiException("保存卡通图片失败: " + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * 生成R2对象key，使用UUID加时间戳避免可猜测
+     */
+    private String generateR2ObjectKey() {
+        String uuid = UUID.randomUUID().toString();
+        long timestamp = Instant.now().toEpochMilli();
+        return String.format("cartoon/%s-%d.jpeg", uuid, timestamp);
     }
 
     /**
